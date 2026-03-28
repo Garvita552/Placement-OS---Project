@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn - Placement OS</title>
+    <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("placement_os_theme")||"ocean");}catch(e){document.documentElement.setAttribute("data-theme","ocean");}</script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="abyss.css">
+    <link rel="stylesheet" href="themes.css">
+</head>
+<body>
+<!-- 🌊 OCEAN BACKGROUND SYSTEM -->
+<div class="ocean-bg">
+    <div class="abyss-hue-orbit" aria-hidden="true"></div>
+    <canvas class="abyss-caustics" id="abyssCaustics" aria-hidden="true"></canvas>
+    <canvas class="abyss-sea-snow" id="abyssSeaSnow" aria-hidden="true"></canvas>
+    <div class="ocean-waves" aria-hidden="true"></div>
+    <div class="ocean-bubbles" aria-hidden="true"></div>
+    <canvas id="particles"></canvas>
+    <div class="jelly-container">
+        <div class="jelly"></div>
+        <div class="jelly"></div>
+    </div>
+    <div class="cursor-glow" id="cursorGlow"></div>
+</div>
+
+<nav class="navbar">
+    <h2><span class="navbar-brand-emoji" aria-hidden="true">🪼</span> Placement OS</h2>
+    <div class="nav-links" id="navLinks">
+        <span data-dive-href="index.html">Home</span>
+        <span data-dive-href="dashboard.html">Topics</span>
+        <span data-dive-href="tracker.html">Tracker</span>
+        <span data-dive-href="daily-tracker.html">Daily</span>
+        <span data-dive-href="timetable.html">Timetable</span>
+        <span data-dive-href="notes.html">Notes</span>
+        <span data-dive-href="ai.html">AI Help</span>
+    </div>
+    <div class="nav-actions">
+        <button type="button" class="theme-toggle" aria-label="Switch ocean or forest theme" title="Ocean ↔ Forest">
+            <span class="theme-toggle__to-forest" aria-hidden="true">🌿</span>
+            <span class="theme-toggle__to-ocean" aria-hidden="true">⚓</span>
+        </button>
+        <span class="username-label" id="usernameLabel">User</span>
+        <button onclick="logout()" style="padding: 10px 14px;">Logout</button>
+        <button class="hamburger" id="hamburgerMenu" type="button" onclick="toggleMobileMenu()" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</nav>
+
+<div class="container main-with-nav">
+    <h1 class="hero-title" style="font-size:34px;">📚 Learning</h1>
+    <p class="hero-sub" id="topicHeader" style="margin-top:10px;"></p>
+
+    <div class="glass-box learn-summary-box" style="margin-top: 18px;">
+        <h2 style="text-align:center; margin-bottom: 12px;">📌 Overview</h2>
+        <p id="summaryText" class="learn-summary-text"></p>
+    </div>
+
+    <div class="glass-box" style="margin-top: 18px;">
+        <h2 style="text-align:center; margin-bottom: 12px;">🧭 Learning roadmap</h2>
+        <p style="text-align:center; opacity:0.82; font-size:14px; margin-bottom:12px;">Phased path — adapt dates to your schedule; sync with Daily Tracker.</p>
+        <ol id="roadmapList" class="topic-roadmap-list"></ol>
+    </div>
+
+    <div class="glass-box" style="margin-top: 18px;">
+        <h2 style="text-align:center; margin-bottom: 12px;">✏️ My plan & notes</h2>
+        <p style="text-align:center; opacity:0.82; font-size:14px; margin-bottom:10px;">Saved only in this browser (<kbd>localStorage</kbd>).</p>
+        <textarea id="topicUserPlan" class="topic-user-plan" rows="5" placeholder="Targets, links, deadlines, mock dates…"></textarea>
+    </div>
+
+    <div class="glass-box" style="margin-top: 18px;">
+        <h2 style="text-align:center; margin-bottom: 12px;">✅ What to master</h2>
+        <div id="checklist"></div>
+    </div>
+
+    <div class="glass-box learn-interview-box" style="margin-top: 18px;">
+        <h2 style="text-align:center; margin-bottom: 12px;">🎤 Interview &amp; reflection</h2>
+        <div id="interviewBlock"></div>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <h2 class="section-title" style="justify-content:center;">🎥 Resources</h2>
+        <p style="text-align:center; opacity:0.85; margin-bottom:16px; max-width:640px; margin-left:auto; margin-right:auto;">Channels and docs to search or open; links open in a new tab when the entry is a URL.</p>
+        <div id="resources" class="resource-grid"></div>
+    </div>
+
+    <div class="glass-box" style="margin-top: 18px;">
+        <h2 style="text-align:center; margin-bottom: 12px;">🚀 Practice plan</h2>
+        <p id="practiceText" class="learn-practice-text"></p>
+    </div>
+
+    <div style="text-align:center; margin-top: 18px; display:flex; flex-wrap:wrap; gap:12px; justify-content:center;">
+        <button id="goToTrackerBtn" type="button">Go to Tracker</button>
+        <button type="button" data-dive-href="daily-tracker.html">Daily Tracker</button>
+        <button type="button" data-dive-href="details.html">Back to topics</button>
+    </div>
+</div>
+
+<script src="theme.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script src="ui.js"></script>
+<script src="abyss-ui.js"></script>
+<script src="abyss-fx.js"></script>
+
+<script>
+    requireAuth();
+
+    function toggleMobileMenu() {
+        const navLinks = document.getElementById("navLinks");
+        const hamburger = document.getElementById("hamburgerMenu");
+        if (navLinks) navLinks.classList.toggle("active");
+        if (hamburger) hamburger.classList.toggle("active");
+    }
+
+    function setAuthUI() {
+        const username = localStorage.getItem("authUser");
+        const el = document.getElementById("usernameLabel");
+        if (el && username) el.textContent = username;
+    }
+
+    setAuthUI();
+
+    const section = localStorage.getItem("section");
+    const topic = localStorage.getItem("topic");
+
+    const header = document.getElementById("topicHeader");
+    if (!section || !topic) {
+        header.textContent = "No topic selected.";
+    } else {
+        header.textContent = `${String(section).toUpperCase()} → ${topic}`;
+    }
+
+    const checklist = document.getElementById("checklist");
+    const resources = document.getElementById("resources");
+    const practiceText = document.getElementById("practiceText");
+    const summaryText = document.getElementById("summaryText");
+    const interviewBlock = document.getElementById("interviewBlock");
+    const roadmapList = document.getElementById("roadmapList");
+    const topicUserPlan = document.getElementById("topicUserPlan");
+
+    function userPlanStorageKey() {
+        return `topic_user_plan_${section || "x"}_${encodeURIComponent(topic || "")}`;
+    }
+
+    function resourceLineHtml(text) {
+        const t = String(text).trim();
+        const isUrl = /^https?:\/\//i.test(t);
+        const inner = isUrl
+            ? `<a href="${escapeHTML(t)}" target="_blank" rel="noopener noreferrer" class="resource-link">${escapeHTML(t)}</a>`
+            : escapeHTML(t);
+        return `<p class="resource-line">${inner}</p>`;
+    }
+
+    function emptyState(msg) {
+        summaryText.textContent = "";
+        interviewBlock.innerHTML = "";
+        if (roadmapList) roadmapList.innerHTML = `<li style="opacity:0.85;">${escapeHTML(msg)}</li>`;
+        checklist.innerHTML = `<p style="text-align:center; opacity:0.85;">${escapeHTML(msg)}</p>`;
+        resources.innerHTML = `<p style="text-align:center; width:100%; color:#94a3b8;">${escapeHTML(msg)}</p>`;
+        practiceText.textContent = "Add plans in Daily Tracker and track practice every day.";
+    }
+
+    async function loadAndRender() {
+        try {
+            const res = await apiFetch(`/api/curriculum?section=${encodeURIComponent(section)}`);
+            const topics = res.topics || [];
+            const content = topics.find(t => t.title === topic);
+
+            if (!content) {
+                emptyState("No curriculum row for this topic yet. Ask your admin to run backend seed, or add a custom topic from the topic list.");
+                return;
+            }
+
+            const summary = (content.summary || "").trim();
+            summaryText.innerHTML = summary
+                ? escapeHTML(summary)
+                : `<span style="opacity:0.85;">Use the checklist and practice plan below. (Re-run <code style="color:#67e8f9;">node seed.js</code> in the backend folder to load the latest overview text.)</span>`;
+
+            const rm = content.roadmap || [];
+            if (roadmapList) {
+                roadmapList.innerHTML = rm.length
+                    ? rm.map((line) => `<li>${escapeHTML(line)}</li>`).join("")
+                    : `<li style="opacity:0.85;">No roadmap rows yet — re-seed the database or add your own steps in “My plan & notes” below.</li>`;
+            }
+
+            const highlights = content.highlights || [];
+            checklist.innerHTML = highlights.length
+                ? `<div class="timeline">
+                    ${highlights.map((h) => `
+                        <div class="timeline-item">
+                            <div class="timeline-content">
+                                <h3 style="font-size: 16px; margin:0; color:#e2e8f0;">${escapeHTML(h)}</h3>
+                            </div>
+                        </div>
+                    `).join("")}
+                </div>`
+                : `<p style="text-align:center; opacity:0.85;">No bullet list stored for this topic.</p>`;
+
+            const iv = content.interviewFocus || [];
+            interviewBlock.innerHTML = iv.length
+                ? `<ul class="interview-focus-list">
+                    ${iv.map((q) => `<li>${escapeHTML(q)}</li>`).join("")}
+                </ul>`
+                : `<p style="text-align:center; opacity:0.85;">No interview prompts stored yet.</p>`;
+
+            const yt = content.youtube || [];
+            const sites = content.websites || [];
+
+            let resourcesHTML = "";
+            yt.forEach((vid) => {
+                resourcesHTML += `
+                    <div class="resource-card" style="border-color: rgba(255, 0, 0, 0.4);">
+                        <h4 style="color:#ff4ecd;">🎥 YouTube / video</h4>
+                        ${resourceLineHtml(vid)}
+                    </div>
+                `;
+            });
+
+            sites.forEach((site) => {
+                resourcesHTML += `
+                    <div class="resource-card" style="border-color: rgba(0, 245, 255, 0.4);">
+                        <h4 style="color:#00f5ff;">📚 Reading</h4>
+                        ${resourceLineHtml(site)}
+                    </div>
+                `;
+            });
+
+            resources.innerHTML =
+                resourcesHTML ||
+                '<p style="text-align:center; width:100%; color:#94a3b8;">No resources listed for this topic.</p>';
+            practiceText.textContent = (content.practice || "").trim() || "Set a measurable goal in Daily Tracker (e.g. N problems or N pages) and log completion.";
+
+        } catch (err) {
+            console.error(err);
+            checklist.innerHTML = `<p style="text-align:center;">Failed to load curriculum.</p>`;
+            summaryText.textContent = err.message || "Network error";
+        }
+    }
+
+    function escapeHTML(s) {
+        return String(s)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    loadAndRender();
+
+    if (section && topic && topicUserPlan) {
+        topicUserPlan.value = localStorage.getItem(userPlanStorageKey()) || "";
+        topicUserPlan.addEventListener("input", () => {
+            localStorage.setItem(userPlanStorageKey(), topicUserPlan.value);
+        });
+    }
+
+    // Buttons
+    document.getElementById("goToTrackerBtn").addEventListener("click", () => {
+        diveTo("tracker.html");
+    });
+
+    const canvas = document.getElementById("particles");
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const coarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    if (canvas && !reduceMotion) {
+        const ctx = canvas.getContext("2d");
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const count = coarsePointer || window.innerWidth < 768 ? 28 : 48;
+        let particles = [];
+        function sizeCanvas() {
+            canvas.width = Math.floor(window.innerWidth * dpr);
+            canvas.height = Math.floor(window.innerHeight * dpr);
+            canvas.style.width = window.innerWidth + "px";
+            canvas.style.height = window.innerHeight + "px";
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            particles = [];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    s: 0.5 + Math.random() * 1.6,
+                    v: 0.2 + Math.random() * 0.4,
+                });
+            }
+        }
+        sizeCanvas();
+        window.addEventListener("resize", sizeCanvas, { passive: true });
+        function frame() {
+            if (!document.hidden) {
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = "rgba(160, 235, 255, 0.12)";
+                for (let i = 0; i < particles.length; i++) {
+                    const p = particles[i];
+                    p.y -= p.v;
+                    if (p.y < -2) p.y = h + 2;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+    }
+    const glow = document.getElementById("cursorGlow");
+    if (glow && !reduceMotion && !coarsePointer) {
+        let gx = 0,
+            gy = 0,
+            mx = 0,
+            my = 0;
+        document.addEventListener("mousemove", (e) => {
+            mx = e.clientX;
+            my = e.clientY;
+        }, { passive: true });
+        function glowLoop() {
+            gx += (mx - gx) * 0.12;
+            gy += (my - gy) * 0.12;
+            glow.style.left = gx + "px";
+            glow.style.top = gy + "px";
+            requestAnimationFrame(glowLoop);
+        }
+        requestAnimationFrame(glowLoop);
+    } else if (glow) glow.style.display = "none";
+</script>
+</body>
+</html>
+

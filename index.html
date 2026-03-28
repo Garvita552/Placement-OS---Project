@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement OS - Home</title>
+    <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("placement_os_theme")||"ocean");}catch(e){document.documentElement.setAttribute("data-theme","ocean");}</script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="abyss.css">
+    <link rel="stylesheet" href="themes.css">
+    <link rel="stylesheet" href="immersive-themes.css">
+    <link rel="stylesheet" href="scroll-text-animations.css">
+    <link rel="stylesheet" href="page-transitions.css">
+    <link rel="stylesheet" href="polish-artist.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+<!-- 🌊 OCEAN BACKGROUND SYSTEM -->
+<div class="ocean-bg">
+    <div class="abyss-hue-orbit" aria-hidden="true"></div>
+    <canvas class="abyss-caustics" id="abyssCaustics" aria-hidden="true"></canvas>
+    <canvas class="abyss-sea-snow" id="abyssSeaSnow" aria-hidden="true"></canvas>
+    <div class="ocean-waves" aria-hidden="true"></div>
+    <div class="ocean-bubbles" aria-hidden="true"></div>
+    <canvas id="particles"></canvas>
+    <div class="jelly-container">
+        <div class="jelly"></div>
+        <div class="jelly"></div>
+    </div>
+    <div class="cursor-glow" id="cursorGlow"></div>
+</div>
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+    <h2><span class="navbar-brand-emoji" aria-hidden="true">🪼</span> Placement OS</h2>
+
+    <div class="nav-links" id="navLinks">
+        <span data-dive-href="index.html">Home</span>
+        <span data-dive-href="dashboard.html">Topics</span>
+        <span data-dive-href="tracker.html">Tracker</span>
+        <span data-dive-href="daily-tracker.html">Daily</span>
+        <span data-dive-href="timetable.html">Timetable</span>
+        <span data-dive-href="notes.html">Notes</span>
+        <span data-dive-href="ai.html">AI Help</span>
+    </div>
+
+    <div class="nav-actions">
+        <button type="button" class="theme-toggle" aria-label="Switch ocean or forest theme" title="Ocean ↔ Forest">
+            <span class="theme-toggle__to-forest" aria-hidden="true">🌿</span>
+            <span class="theme-toggle__to-ocean" aria-hidden="true">⚓</span>
+        </button>
+        <span class="username-label" id="usernameLabel">User</span>
+        <button onclick="logout()" style="padding: 10px 14px;">Logout</button>
+        <button class="hamburger" id="hamburgerMenu" onclick="toggleMobileMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- ================= MAIN ================= -->
+<div class="container">
+    <h1 class="hero-title" data-split-text="words">🌊 Dive Into Placement Preparation</h1>
+    <p class="hero-sub" data-text-hover="glow">Learn • Plan • Track • Evolve</p>
+
+    <div style="text-align:center; margin-top: 12px; opacity: 0.9;">
+        Welcome, <span id="welcomeUser" style="color:#00f5ff; font-weight:700;"></span> 🚀
+    </div>
+
+    <div style="margin-top: 35px;">
+        <h2 class="section-title" style="justify-content:center;" data-split-text="words" data-scroll-trigger="fadeIn">🎯 Placement Preparation</h2>
+        <div class="cards" id="placementCards"></div>
+    </div>
+
+    <div style="margin-top: 35px;">
+        <h2 class="section-title" style="justify-content:center;" data-split-text="words" data-scroll-trigger="fadeIn">📈 Daily Tracker & Guidance</h2>
+        <div class="cards" id="productCards"></div>
+    </div>
+
+    <div style="margin-top: 35px; display:flex; gap:18px; flex-wrap:wrap; justify-content:center;">
+        <div class="glass-box" style="flex: 1; min-width: 320px; max-width: 650px;">
+            <h2 class="section-title" style="justify-content:center;">📊 Last 7 Days Progress</h2>
+            <canvas id="homeProgressChart"></canvas>
+        </div>
+        <div class="glass-box" style="flex: 1; min-width: 320px; max-width: 520px;">
+            <h2 class="section-title" style="justify-content:center;">🔥 Weak Areas (Plan vs Done)</h2>
+            <div id="weakAreas" style="text-align:center; opacity: 0.95;"></div>
+            <p style="margin-top: 10px; opacity: 0.75; text-align:center;">Tip: set plans in Daily Tracker for stronger insights.</p>
+        </div>
+    </div>
+
+    <div style="margin-top: 25px; text-align:center; opacity: 0.8; line-height: 1.8;">
+        Useful links:
+        <a href="https://leetcode.com/" target="_blank" rel="noreferrer">LeetCode</a> ·
+        <a href="https://www.geeksforgeeks.org/" target="_blank" rel="noreferrer">GeeksforGeeks</a> ·
+        <a href="https://www.codechef.com/" target="_blank" rel="noreferrer">CodeChef</a> ·
+        <a href="https://developer.mozilla.org/" target="_blank" rel="noreferrer">MDN</a> ·
+        <a href="https://www.interviewbit.com/" target="_blank" rel="noreferrer">InterviewBit</a>
+    </div>
+</div>
+
+<script src="theme.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script src="placement-content.js"></script>
+<script src="ui.js"></script>
+<script src="abyss-fx.js"></script>
+<script src="dynamic.js"></script>
+<script src="magnetic-cursor.js"></script>
+<script src="smooth-scroll-animations.js"></script>
+<script src="abyss-ui.js"></script>
+<script src="page-transitions.js"></script>
+<script src="hitbox-system.js"></script>
+
+<script>
+
+    function toggleMobileMenu() {
+        const navLinks = document.getElementById('navLinks');
+        const hamburger = document.getElementById('hamburgerMenu');
+        navLinks.classList.toggle('active');
+        hamburger.classList.toggle('active');
+    }
+
+    function getISODate(d) {
+        const date = d instanceof Date ? d : new Date(d);
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function addDaysISO(iso, delta) {
+        const date = new Date(iso);
+        date.setDate(date.getDate() + delta);
+        return getISODate(date);
+    }
+
+    function escapeHTML(s) {
+        return String(s)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    async function drawHome() {
+        const today = getISODate(new Date());
+        const from = addDaysISO(today, -6);
+
+        const points = await apiFetch(`/api/analytics/range?from=${encodeURIComponent(from)}&to=${encodeURIComponent(today)}`);
+        const weak = await apiFetch(`/api/analytics/weak-topics?days=7&limit=6`);
+
+        const ctx = document.getElementById("homeProgressChart");
+        if (ctx && points && points.points) {
+            const vals = points.points.map(p => p.totalCompleted);
+            const ds = window.AbyssChart
+                ? window.AbyssChart.lineDataset("Questions solved", vals)
+                : {
+                      label: "Questions solved",
+                      data: vals,
+                      borderWidth: 2,
+                      tension: 0.35,
+                      fill: true,
+                      borderColor: "rgba(34, 211, 238, 0.95)",
+                      backgroundColor: "rgba(34, 211, 238, 0.15)",
+                  };
+            new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: points.points.map(p => p.date),
+                    datasets: [ds],
+                },
+                options: {
+                    responsive: true,
+                    animation: { duration: 720, easing: "easeOutQuart" },
+                    plugins: { legend: { labels: { color: "#e0f7ff" } } },
+                    scales: {
+                        x: { ticks: { color: "#e0f7ff" } },
+                        y: { ticks: { color: "#e0f7ff" } },
+                    },
+                },
+            });
+        }
+
+        const weakEl = document.getElementById("weakAreas");
+        if (!weakEl) return;
+
+        if (!weak.items || weak.items.length === 0) {
+            weakEl.innerHTML = "No weak areas yet. Start planning today ✨";
+            return;
+        }
+
+        weakEl.innerHTML = weak.items.map(i => {
+            return `<div style="margin: 10px 0; padding: 12px; border-radius: 16px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08);">
+                        <div style="color:#00f5ff; font-weight:700;">${escapeHTML(i.section)} → ${escapeHTML(i.topic)}</div>
+                        <div style="opacity:0.85; margin-top:4px;">Done: ${i.totalCompleted} / Planned: ${i.totalPlanned}</div>
+                    </div>`;
+        }).join("");
+    }
+
+    function requireSetup() {
+        if (!requireAuth()) return;
+
+        setAuthUI();
+        const username = localStorage.getItem("authUser") || "";
+        const welcomeEl = document.getElementById("welcomeUser");
+        if (welcomeEl) welcomeEl.textContent = username;
+
+        const NOTE_PREFIX = "placement_user_note_";
+
+        function openDomain(card) {
+            const setKey = card.getAttribute("data-set");
+            const link = card.getAttribute("data-link");
+            if (link) diveTo(link);
+            else if (setKey) {
+                localStorage.setItem("section", setKey);
+                diveTo("details.html");
+            }
+        }
+
+        // Placement Prep cards (content from placement-content.js)
+        const placementCards = document.getElementById("placementCards");
+        let placement = window.PLACEMENT_DOMAIN_CARDS;
+        if (!Array.isArray(placement) || !placement.length) {
+            placement = [
+                {
+                    title: "Could not load card data",
+                    desc: "Ensure placement-content.js is in the same folder as index.html and refresh.",
+                    set: "aptitude",
+                    storageKey: "fallback",
+                    pillars: ["Fix"],
+                    roadmap: [{ t: "Now", d: "Check the browser console (F12) for 404 on placement-content.js." }],
+                },
+            ];
+        }
+
+        placementCards.innerHTML = placement
+            .map((c, i) => {
+                const dataSet = c.set != null ? c.set : "";
+                const dataLink = c.link || "";
+                const sk = c.storageKey || `p${i}`;
+                const noteKey = NOTE_PREFIX + sk;
+                const saved = localStorage.getItem(noteKey) || "";
+                const pillars = (c.pillars || []).map((p) => `<span class="domain-pillar">${escapeHTML(p)}</span>`).join("");
+                const road = (c.roadmap || [])
+                    .map(
+                        (r) =>
+                            `<li><strong>${escapeHTML(r.t)}</strong> — ${escapeHTML(r.d)}</li>`
+                    )
+                    .join("");
+                return `<article class="card card--domain card--enter" style="--stagger:${i}">
+                    <div class="card-shimmer" aria-hidden="true"></div>
+                    <h3>${escapeHTML(c.title)}</h3>
+                    <p class="card-desc">${escapeHTML(c.desc)}</p>
+                    <div class="domain-pillars">${pillars}</div>
+                    <div class="domain-roadmap-wrap">
+                        <span class="domain-roadmap-label">Roadmap</span>
+                        <ol class="domain-roadmap">${road}</ol>
+                    </div>
+                    <label class="domain-note-label">Your goals & notes <span class="domain-note-hint">(saved on this device)</span></label>
+                    <textarea class="domain-note" rows="3" data-note-key="${escapeHTML(noteKey)}" placeholder="e.g. Target: 5 mediums/week · Finish graphs by March 15 · Link to portfolio…">${escapeHTML(saved)}</textarea>
+                    <div class="card-footer-row">
+                        <button type="button" class="btn-card-open">Open syllabus →</button>
+                        <span class="card-ripple-hint">Full topic list + resources inside</span>
+                    </div>
+                </article>`;
+            })
+            .join("");
+
+        placementCards.querySelectorAll(".card--domain").forEach((card) => {
+            const ta = card.querySelector(".domain-note");
+            if (ta) {
+                ta.addEventListener("mousedown", (e) => e.stopPropagation());
+                ta.addEventListener("click", (e) => e.stopPropagation());
+                ta.addEventListener("keydown", (e) => e.stopPropagation());
+                ta.addEventListener("input", () => {
+                    const k = ta.getAttribute("data-note-key");
+                    if (k) localStorage.setItem(k, ta.value);
+                });
+            }
+            card.querySelector(".btn-card-open")?.addEventListener("click", (e) => {
+                e.stopPropagation();
+                openDomain(card);
+            });
+            card.addEventListener("click", (e) => {
+                if (e.target.closest("textarea, button")) return;
+                openDomain(card);
+            });
+        });
+
+        // Productivity cards
+        const productCards = document.getElementById("productCards");
+        let product = window.PRODUCTIVITY_CARDS_DATA;
+        if (!Array.isArray(product) || !product.length) {
+            product = [{ title: "Productivity tools", desc: "Load placement-content.js to see all tools.", link: "dashboard.html", storageKey: "fb", roadmap: [] }];
+        }
+
+        productCards.innerHTML = product
+            .map((c, i) => {
+                const sk = c.storageKey || `w${i}`;
+                const noteKey = NOTE_PREFIX + "work_" + sk;
+                const saved = localStorage.getItem(noteKey) || "";
+                const road = (c.roadmap || [])
+                    .map((r) => `<li><strong>${escapeHTML(r.t)}</strong> — ${escapeHTML(r.d)}</li>`)
+                    .join("");
+                return `<article class="card card--domain card--product card--enter" style="--stagger:${i}">
+                    <div class="card-shimmer" aria-hidden="true"></div>
+                    <h3>${escapeHTML(c.title)}</h3>
+                    <p class="card-desc">${escapeHTML(c.desc)}</p>
+                    <div class="domain-roadmap-wrap domain-roadmap-wrap--compact">
+                        <span class="domain-roadmap-label">How to use</span>
+                        <ol class="domain-roadmap">${road}</ol>
+                    </div>
+                    <label class="domain-note-label">Your workflow notes</label>
+                    <textarea class="domain-note" rows="2" data-note-key="${escapeHTML(noteKey)}" placeholder="Shortcuts, reminders, links…">${escapeHTML(saved)}</textarea>
+                    <div class="card-footer-row">
+                        <button type="button" class="btn-card-open" data-link="${escapeHTML(c.link)}">Open tool →</button>
+                    </div>
+                </article>`;
+            })
+            .join("");
+
+        productCards.querySelectorAll(".card--product").forEach((card) => {
+            const ta = card.querySelector(".domain-note");
+            if (ta) {
+                ta.addEventListener("mousedown", (e) => e.stopPropagation());
+                ta.addEventListener("click", (e) => e.stopPropagation());
+                ta.addEventListener("input", () => {
+                    const k = ta.getAttribute("data-note-key");
+                    if (k) localStorage.setItem(k, ta.value);
+                });
+            }
+            const btn = card.querySelector(".btn-card-open");
+            const dest = btn?.getAttribute("data-link");
+            btn?.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (dest) diveTo(dest);
+            });
+            card.addEventListener("click", (e) => {
+                if (e.target.closest("textarea, button")) return;
+                if (dest) diveTo(dest);
+            });
+        });
+    }
+
+    // Require and draw
+    requireSetup();
+    drawHome().catch(() => {
+        const weakEl = document.getElementById("weakAreas");
+        if (weakEl) weakEl.textContent = "Could not load analytics yet.";
+    });
+
+    // Lightweight particles (single pass per frame; pauses when tab hidden)
+    const canvas = document.getElementById("particles");
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const coarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    let particlesRaf = 0;
+
+    function resizeParticles() {
+        if (!canvas) return;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.floor(window.innerWidth * dpr);
+        canvas.height = Math.floor(window.innerHeight * dpr);
+        canvas.style.width = window.innerWidth + "px";
+        canvas.style.height = window.innerHeight + "px";
+        const ctx = canvas.getContext("2d");
+        if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    if (canvas && !reduceMotion) {
+        const ctx = canvas.getContext("2d");
+        const count = coarsePointer || window.innerWidth < 768 ? 32 : 56;
+        let particles = [];
+
+        function initParticles() {
+            particles = [];
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    s: 0.6 + Math.random() * 1.8,
+                    v: 0.25 + Math.random() * 0.45,
+                });
+            }
+        }
+
+        resizeParticles();
+        initParticles();
+        window.addEventListener(
+            "resize",
+            () => {
+                resizeParticles();
+                initParticles();
+            },
+            { passive: true }
+        );
+
+        function frame() {
+            if (document.hidden) {
+                particlesRaf = requestAnimationFrame(frame);
+                return;
+            }
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = "rgba(180, 240, 255, 0.14)";
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.y -= p.v;
+                if (p.y < -4) p.y = h + 4;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            particlesRaf = requestAnimationFrame(frame);
+        }
+        particlesRaf = requestAnimationFrame(frame);
+    }
+
+    const glow = document.getElementById("cursorGlow");
+    if (glow && !reduceMotion && !coarsePointer) {
+        let gx = 0,
+            gy = 0,
+            mx = 0,
+            my = 0,
+            glowRaf = 0;
+        document.addEventListener(
+            "mousemove",
+            (e) => {
+                mx = e.clientX;
+                my = e.clientY;
+            },
+            { passive: true }
+        );
+        function glowLoop() {
+            gx += (mx - gx) * 0.12;
+            gy += (my - gy) * 0.12;
+            glow.style.left = gx + "px";
+            glow.style.top = gy + "px";
+            glowRaf = requestAnimationFrame(glowLoop);
+        }
+        glowRaf = requestAnimationFrame(glowLoop);
+    } else if (glow) {
+        glow.style.display = "none";
+    }
+</script>
+
+</body>
+</html>
+

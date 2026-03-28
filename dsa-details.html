@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA details — Placement OS</title>
+    <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("placement_os_theme")||"ocean");}catch(e){document.documentElement.setAttribute("data-theme","ocean");}</script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="motion.css">
+    <link rel="stylesheet" href="abyss.css">
+    <link rel="stylesheet" href="themes.css">
+</head>
+<body>
+
+<div class="container main-with-nav">
+    <header class="page-hero page-hero--animate" data-parallax="0.08">
+        <div class="page-hero__glow" aria-hidden="true"></div>
+        <p class="page-hero__eyebrow">Roadmap</p>
+        <h1 class="page-hero__title">
+            <span class="page-hero__line"><span class="page-hero__line-inner" id="title">…</span></span>
+        </h1>
+        <p class="page-hero__lede">Structured phases, company-style guidance, and hand-picked resources for the band you selected.</p>
+    </header>
+
+    <section class="data-panel" data-reveal>
+        <div class="data-panel__head">
+            <div>
+                <div class="data-panel__eyebrow">Syllabus</div>
+                <h2 class="data-panel__title">Your level</h2>
+                <p class="data-panel__meta">Work top-to-bottom or jump to weak areas — cross-link to the main topic tracker when you drill a theme.</p>
+            </div>
+        </div>
+        <div class="data-panel__body" id="content"></div>
+    </section>
+
+    <div class="page-actions" data-reveal>
+        <button id="backBtn" type="button">← Back to roadmap</button>
+        <button type="button" data-dive-href="dashboard.html">All sections</button>
+    </div>
+</div>
+
+<script src="theme.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script>
+    requireAuth();
+    window.__SHELL_ACTIVE__ = "dashboard";
+</script>
+<script src="ui.js"></script>
+<script src="abyss-ui.js"></script>
+<script src="shell.js"></script>
+<script src="motion.js"></script>
+<script src="abyss-fx.js"></script>
+
+<script>
+    // ================= INIT =================
+
+    const type = localStorage.getItem("dsaType");
+    const title = document.getElementById("title");
+    const content = document.getElementById("content");
+    const backBtn = document.getElementById("backBtn");
+
+    if (!type) {
+        alert("No roadmap selected!");
+        window.location.href = "dsa.html";
+    }
+
+    // ================= DATA =================
+
+    const roadmapData = {
+        full: {
+            title: "📘 COMPLETE DSA SYLLABUS",
+            content: `
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🟢 Fundamentals</h3>
+                            <ul><li>Time Complexity</li><li>Recursion</li><li>Mathematics</li></ul>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🟢 Arrays</h3>
+                            <ul><li>Sliding Window</li><li>Kadane’s Algorithm</li></ul>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🟢 Strings</h3>
+                            <ul><li>KMP Algorithm</li><li>Rabin-Karp</li></ul>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🟢 Linked List</h3>
+                            <ul><li>Reverse Linked List</li><li>Cycle Detection</li></ul>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🟢 Trees</h3>
+                            <ul><li>Traversals</li><li>LCA</li><li>Diameter</li></ul>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🔴 Dynamic Programming</h3>
+                            <ul><li>Knapsack</li><li>LIS</li><li>LCS</li></ul>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🔴 Graphs</h3>
+                            <ul><li>BFS / DFS</li><li>Dijkstra</li></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-box" style="margin-top:40px;">
+                    <h2>🏢 Package Guidance (SI + Product)</h2>
+                    <p style="color:#cbd5e1; margin-bottom:10px;">Best for: students aiming for both Indian SIs and top product roles.</p>
+                    <ul style="color:#94a3b8; list-style-position: inside;">
+                        <li>For Product roles, focus more on: Graph/DP depth + clean implementations.</li>
+                        <li>For SIs, focus more on: consistent problem-solving across arrays/strings/trees.</li>
+                    </ul>
+                </div>
+
+                <h3 class="section-title" style="margin-top:40px;">📚 Top Resources</h3>
+                <div class="resource-grid">
+                    <div class="resource-card" onclick="window.open('https://www.youtube.com/@takeUforward', '_blank')">
+                        <h4>🎥 takeUforward</h4><p>Topic learning + patterns</p>
+                    </div>
+                    <div class="resource-card" onclick="window.open('https://leetcode.com', '_blank')">
+                        <h4>💻 LeetCode</h4><p>Core DSA practice</p>
+                    </div>
+                    <div class="resource-card" onclick="window.open('https://www.youtube.com/@Striver', '_blank')">
+                        <h4>🎥 Striver</h4><p>A2Z Playlists</p>
+                    </div>
+                    <div class="resource-card" onclick="window.open('https://www.geeksforgeeks.org/', '_blank')">
+                        <h4>📖 GeeksforGeeks</h4><p>Concept + Problems</p>
+                    </div>
+                </div>
+            `
+        },
+
+        "5lpa": {
+            title: "💼 DSA for 5–6 LPA",
+            content: `
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🧱 Core Topics</h3>
+                            <ul>
+                                <li>Arrays (sliding window, max-subarray)</li>
+                                <li>Strings (two pointers, basics)</li>
+                                <li>Basic Recursion (reduce to simple cases)</li>
+                                <li>Sorting (comparator + common patterns)</li>
+                                <li>Linked List (reverse + cycle)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-box" style="margin-top:40px;">
+                    <h2>🏢 Company Guidance</h2>
+                    <ul style="color:#94a3b8; list-style-position: inside;">
+                        <li>Indian SIs: expect strong fundamentals + clean implementations.</li>
+                        <li>Product entry rounds: focus on correctness + efficient basics (arrays/strings/linked list).</li>
+                    </ul>
+                    <p style="color:#cbd5e1; margin-top:15px;"><strong>Pace:</strong> Aim for ~120–200 problems. Daily: 1 topic + 20-30 practice questions.</p>
+                </div>
+
+                <h3 class="section-title" style="margin-top:40px;">📚 Top Resources</h3>
+                <div class="resource-grid">
+                    <div class="resource-card" onclick="window.open('https://www.youtube.com/@takeUforward', '_blank')">
+                        <h4>🎥 takeUforward</h4><p>Best for beginners</p>
+                    </div>
+                    <div class="resource-card" onclick="window.open('https://leetcode.com', '_blank')">
+                        <h4>💻 LeetCode</h4><p>Easy/Medium sets</p>
+                    </div>
+                </div>
+            `
+        },
+
+        "10lpa": {
+            title: "🚀 DSA for 10 LPA",
+            content: `
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🧱 Mid-Level mastery</h3>
+                            <ul>
+                                <li>All 5–6 LPA topics</li>
+                                <li>Trees (traversals, LCA basics)</li>
+                                <li>Stack & Queue (monotonic patterns, balancing)</li>
+                                <li>Hashing (frequency, hashing tricks)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-box" style="margin-top:40px;">
+                    <h2>🏢 Company Guidance</h2>
+                    <ul style="color:#94a3b8; list-style-position: inside;">
+                        <li>Indian SIs: start seeing more tree/stack questions + edge cases.</li>
+                        <li>Product: hashing + trees correctness and time complexity become important.</li>
+                    </ul>
+                    <p style="color:#cbd5e1; margin-top:15px;"><strong>Pace:</strong> Aim for ~250–400 problems. Daily: 2 topic sessions (e.g., one tree + one hashing).</p>
+                </div>
+                
+                <h3 class="section-title" style="margin-top:40px;">📚 Top Resources</h3>
+                <div class="resource-grid">
+                    <div class="resource-card" onclick="window.open('https://www.youtube.com/@Striver', '_blank')">
+                        <h4>🎥 Striver</h4><p>Trees + Stack/Queue + Hashing</p>
+                    </div>
+                    <div class="resource-card" onclick="window.open('https://leetcode.com', '_blank')">
+                        <h4>💻 LeetCode</h4><p>Medium sets</p>
+                    </div>
+                </div>
+            `
+        },
+
+        "20lpa": {
+            title: "🔥 DSA for 10–20 LPA",
+            content: `
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🧱 Advanced Patterns</h3>
+                            <ul>
+                                <li>All previous topics</li>
+                                <li>Graphs (BFS/DFS patterns, shortest paths)</li>
+                                <li>Greedy Algorithms</li>
+                                <li>Backtracking (combinations, permutations, decision trees)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-box" style="margin-top:40px;">
+                    <h2>🏢 Company Guidance</h2>
+                    <ul style="color:#94a3b8; list-style-position: inside;">
+                        <li>Indian SIs: expect problem-solving across graph variants and recursion-to-brute-force to optimize.</li>
+                        <li>Product: greedy/backtracking questions judge thinking + pruning skills.</li>
+                    </ul>
+                    <p style="color:#cbd5e1; margin-top:15px;"><strong>Pace:</strong> Aim for ~400–600 problems, including early hard practice.</p>
+                </div>
+
+                <h3 class="section-title" style="margin-top:40px;">📚 Top Resources</h3>
+                <div class="resource-grid">
+                    <div class="resource-card" onclick="window.open('https://www.youtube.com/@Striver', '_blank')">
+                        <h4>🎥 Striver</h4><p>Graphs + Greedy + Backtracking</p>
+                    </div>
+                    <div class="resource-card" onclick="window.open('https://leetcode.com', '_blank')">
+                        <h4>💻 LeetCode</h4><p>Medium/Hard starter sets</p>
+                    </div>
+                </div>
+            `
+        },
+
+        "50lpa": {
+            title: "🧠 DSA for 20–50 LPA",
+            content: `
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🧱 Deep Expertise</h3>
+                            <ul>
+                                <li>Dynamic Programming (state/transition patterns)</li>
+                                <li>Advanced Graphs (shortest paths, advanced traversals)</li>
+                                <li>Heaps (priority queue based strategies)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-box" style="margin-top:40px;">
+                    <h2>🏢 Company Guidance</h2>
+                    <ul style="color:#94a3b8; list-style-position: inside;">
+                        <li>Indian SIs: deeper DP + advanced graph variants are common at this level.</li>
+                        <li>Product: expects optimized solutions + crisp reasoning under constraints.</li>
+                    </ul>
+                    <p style="color:#cbd5e1; margin-top:15px;"><strong>Pace:</strong> Aim for ~600–800 problems with strong DP/graph focus.</p>
+                </div>
+
+                <h3 class="section-title" style="margin-top:40px;">📚 Top Resources</h3>
+                <div class="resource-grid">
+                    <div class="resource-card" onclick="window.open('https://www.youtube.com/@KunalKushwaha', '_blank')">
+                        <h4>🎥 Kunal Kushwaha</h4><p>Dynamic Programming</p>
+                    </div>
+                    <div class="resource-card" onclick="window.open('https://leetcode.com', '_blank')">
+                        <h4>💻 LeetCode</h4><p>Hard + DP/Graph focused</p>
+                    </div>
+                </div>
+            `
+        },
+
+        top: {
+            title: "🏆 DSA for 50+ LPA",
+            content: `
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>🧱 Master Class</h3>
+                            <ul>
+                                <li>Advanced Dynamic Programming</li>
+                                <li>Segment Trees</li>
+                                <li>Trie</li>
+                                <li>Competitive Programming level problems</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-box" style="margin-top:40px;">
+                    <h2>🏢 Company Guidance</h2>
+                    <ul style="color:#94a3b8; list-style-position: inside;">
+                        <li>Indian SIs: often test implementation depth + speed under constraints.</li>
+                        <li>Product: segment trees/tries/advanced DP + CP-level optimization is where differentiation happens.</li>
+                    </ul>
+                    <p style="color:#cbd5e1; margin-top:15px;"><strong>Pace:</strong> Aim for ~800–1200 problems overall. Daily: 1 advanced topic + 1 CP problem.</p>
+                </div>
+
+                <h3 class="section-title" style="margin-top:40px;">📚 Top Resources</h3>
+                <div class="resource-grid">
+                    <div class="resource-card" onclick="window.open('https://www.youtube.com/@Striver', '_blank')">
+                        <h4>🎥 Striver</h4><p>Advanced DS + CP patterns</p>
+                    </div>
+                    <div class="resource-card" onclick="window.open('https://leetcode.com', '_blank')">
+                        <h4>💻 LeetCode</h4><p>Top-tier hard sets</p>
+                    </div>
+                    <div class="resource-card" onclick="window.open('https://www.codechef.com/', '_blank')">
+                        <h4>🏆 CodeChef</h4><p>CP practice discipline</p>
+                    </div>
+                </div>
+            `
+        }
+    };
+
+    // ================= RENDER =================
+
+    if (!roadmapData[type]) {
+        title.textContent = "Invalid selection";
+        content.innerHTML = "<p class=\"td-muted\">Something went wrong — return to the roadmap and pick a level again.</p>";
+    } else {
+        title.textContent = roadmapData[type].title;
+        content.innerHTML = roadmapData[type].content;
+    }
+
+    backBtn.addEventListener("click", () => {
+        diveTo("dsa.html");
+    });
+</script>
+
+</body>
+</html>

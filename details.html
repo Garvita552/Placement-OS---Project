@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topics — Placement OS</title>
+    <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("placement_os_theme")||"ocean");}catch(e){document.documentElement.setAttribute("data-theme","ocean");}</script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="motion.css">
+    <link rel="stylesheet" href="abyss.css">
+    <link rel="stylesheet" href="themes.css">
+</head>
+<body>
+<div class="container main-with-nav">
+    <header class="page-hero page-hero--animate" data-parallax="0.08">
+        <div class="page-hero__glow" aria-hidden="true"></div>
+        <p class="page-hero__eyebrow">Section</p>
+        <h1 class="page-hero__title">
+            <span class="page-hero__line"><span class="page-hero__line-inner" id="title">Loading…</span></span>
+        </h1>
+        <p class="page-hero__lede" id="sectionBlurb"></p>
+    </header>
+
+    <section class="data-panel" data-reveal>
+        <div class="data-panel__head">
+            <div>
+                <div class="data-panel__eyebrow">Syllabus</div>
+                <h2 class="data-panel__title">Topics in this track</h2>
+                <p class="data-panel__meta">Open a card for the full learning view. The dashed card adds a custom topic to this section via the API.</p>
+            </div>
+        </div>
+        <div class="data-panel__body">
+            <div class="cards" id="content"></div>
+        </div>
+    </section>
+
+    <div class="page-actions" data-reveal>
+        <button id="backBtn" type="button">← All sections</button>
+    </div>
+</div>
+
+<script src="theme.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script>
+    requireAuth();
+    window.__SHELL_ACTIVE__ = "details";
+</script>
+<script src="ui.js"></script>
+<script src="abyss-ui.js"></script>
+<script src="shell.js"></script>
+<script src="motion.js"></script>
+<script src="abyss-fx.js"></script>
+<script>
+    const SECTION_LABELS = {
+        aptitude: "Aptitude & reasoning",
+        dsa: "Data structures & algorithms",
+        academics: "CS core (OS, DBMS, networks)",
+        webdev: "Web development",
+        devops: "DevOps & platforms",
+        ml: "Machine learning",
+        datascience: "Data science",
+        softskills: "Soft skills & HR",
+        fullstack: "Full-stack engineering",
+        java: "Java backend",
+        python: "Python & backends",
+        cloudengineer: "Cloud engineering",
+    };
+
+    const SECTION_INTRO = {
+        aptitude: "Quant, logic, verbal, DI — balanced weekly practice and mocks.",
+        dsa: "Open dsa.html for the curated DSA track, or pick topics below.",
+        academics: "Theory crisp enough to explain in 60–90 seconds on a whiteboard.",
+        webdev: "HTML/CSS/JS/React/TS/performance/security for frontend roles.",
+        devops: "Linux, containers, K8s, CI/CD, cloud primitives.",
+        ml: "Models, metrics, and honest limits of ML in products.",
+        datascience: "Pandas workflow, EDA, viz, and statistics.",
+        softskills: "Resume, STAR stories, communication, and interview presence.",
+        fullstack: "Front + back + data + auth + deployment as one system.",
+        java: "OOP, collections, concurrency, Spring/JPA.",
+        python: "Idiomatic Python, FastAPI/Django, testing.",
+        cloudengineer: "IAM, compute, storage, serverless, observability.",
+    };
+
+    const section = localStorage.getItem("section");
+    const title = document.getElementById("title");
+    const sectionBlurb = document.getElementById("sectionBlurb");
+    const content = document.getElementById("content");
+    const backBtn = document.getElementById("backBtn");
+
+    if (!section) {
+        alert("No section selected!");
+        window.location.href = "index.html";
+    }
+
+    title.textContent = SECTION_LABELS[section] || section.replace(/_/g, " ");
+    sectionBlurb.textContent = SECTION_INTRO[section] || "Pick a topic to open the full learning view.";
+
+    function escapeHTML(s) {
+        return String(s)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    function cardPreview(topicObj) {
+        const sum = (topicObj.summary || "").trim();
+        const rm = (topicObj.roadmap || [])[0];
+        if (sum.length > 200) return escapeHTML(sum.slice(0, 197)) + "…";
+        if (sum) return escapeHTML(sum);
+        if (rm) return escapeHTML(rm.length > 200 ? rm.slice(0, 197) + "…" : rm);
+        const h = (topicObj.highlights || [])[0];
+        if (h) return escapeHTML(h);
+        return "Open for roadmap, checklist, interview prompts, resources, and your notes.";
+    }
+
+    async function loadTopics() {
+        content.innerHTML = `<p class="td-muted" style="grid-column: 1 / -1; text-align: center; padding: 24px;">Loading topics…</p>`;
+        try {
+            const res = await apiFetch(`/api/curriculum?section=${encodeURIComponent(section)}`);
+            const topics = res.topics || [];
+
+            content.innerHTML = "";
+
+            if (topics.length === 0) {
+                content.innerHTML =
+                    `<p style="grid-column: 1 / -1; text-align: center;">No topics for this section. Run <code>node seed.js</code> in the backend folder after MongoDB is up.</p>`;
+            } else {
+                topics.forEach((topicObj) => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.setAttribute("data-tilt", "");
+                    const bullets = (topicObj.highlights || []).length;
+                    const rc = (topicObj.roadmap || []).length;
+                    const badgeBits = [`${bullets} focus areas`];
+                    if (rc) badgeBits.push(`${rc} roadmap steps`);
+                    card.innerHTML = `
+                        <h3>${escapeHTML(topicObj.title)}</h3>
+                        <p>${cardPreview(topicObj)}</p>
+                        <div class="badge"><strong>Study</strong> · ${badgeBits.join(" · ")}</div>
+                    `;
+
+                    card.addEventListener("click", () => {
+                        localStorage.setItem("topic", topicObj.title);
+                        window.location.href = "topic-learn.html";
+                    });
+
+                    content.appendChild(card);
+                });
+            }
+
+            const addCard = document.createElement("div");
+            addCard.className = "card";
+            addCard.style.borderStyle = "dashed";
+            addCard.style.borderColor = "var(--c-cyan)";
+            addCard.style.justifyContent = "center";
+            addCard.style.alignItems = "center";
+            addCard.innerHTML = `
+                <h3 style="margin:0; text-align:center;">➕ Add custom topic</h3>
+                <p style="text-align:center; margin-top:10px;">Create your own syllabus item.</p>
+            `;
+            addCard.addEventListener("click", async () => {
+                const newTitle = prompt("Enter the name of your custom topic:");
+                if (newTitle) {
+                    try {
+                        await apiFetch("/api/curriculum", {
+                            method: "POST",
+                            body: JSON.stringify({ section, title: newTitle.trim() }),
+                        });
+                        loadTopics();
+                    } catch (err) {
+                        alert(err.message || "Failed to add topic");
+                    }
+                }
+            });
+            content.appendChild(addCard);
+        } catch (err) {
+            console.error(err);
+            content.innerHTML = `<p style="grid-column: 1 / -1; text-align: center;">Failed to load topics: ${escapeHTML(err.message || "error")}</p>`;
+        }
+    }
+
+    loadTopics();
+
+    backBtn.addEventListener("click", () => {
+        diveTo("dashboard.html");
+    });
+</script>
+</body>
+</html>

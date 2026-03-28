@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timetable - Placement OS</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="motion.css">
+    <link rel="stylesheet" href="abyss.css">
+</head>
+<body>
+<div class="container main-with-nav">
+    <header class="page-hero page-hero--animate" data-parallax="0.08">
+        <div class="page-hero__glow" aria-hidden="true"></div>
+        <p class="page-hero__eyebrow">Plan</p>
+        <h1 class="page-hero__title">
+            <span class="page-hero__line"><span class="page-hero__line-inner">Weekly timetable</span></span>
+        </h1>
+        <p class="page-hero__lede">Block recurring slots by day. Everything syncs to your account through the API—use this as your single source of truth for routine.</p>
+    </header>
+
+    <section class="data-panel" data-reveal>
+        <div class="data-panel__head">
+            <div>
+                <div class="data-panel__eyebrow">Step 1</div>
+                <h2 class="data-panel__title">Add a block</h2>
+                <p class="data-panel__meta">Pick the weekday, subject or topic label, time range, and optional notes (e.g. “LeetCode only”, “Mock test”).</p>
+            </div>
+        </div>
+        <div class="data-panel__body">
+            <div class="panel-toolbar">
+                <label>
+                    Day
+                    <select id="daySelect">
+                        <option value="1">Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3">Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                        <option value="0">Sunday</option>
+                    </select>
+                </label>
+                <label style="flex: 1; min-width: 180px;">
+                    Subject / topic
+                    <input id="subjectInput" type="text" placeholder="e.g. DSA — graphs" />
+                </label>
+                <label>
+                    Start
+                    <input id="startTimeInput" type="time" />
+                </label>
+                <label>
+                    End
+                    <input id="endTimeInput" type="time" />
+                </label>
+                <label style="flex: 1; min-width: 200px;">
+                    Notes
+                    <input id="notesInput" type="text" placeholder="Optional focus" />
+                </label>
+                <button id="addBtn" type="button">Add to schedule</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="data-panel" data-reveal data-reveal-delay="80ms">
+        <div class="data-panel__head">
+            <div>
+                <div class="data-panel__eyebrow">Step 2</div>
+                <h2 class="data-panel__title">Your saved blocks</h2>
+                <p class="data-panel__meta">Load one day to edit that rhythm, or load the full week to review conflicts and density.</p>
+            </div>
+            <div class="data-panel__actions">
+                <button id="loadDayBtn" type="button">Load selected day</button>
+                <button id="loadAllBtn" type="button">Load full week</button>
+            </div>
+        </div>
+        <div class="data-panel__body data-panel__body--flush">
+            <div class="table-pro-wrap">
+                <table class="table-pro">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Subject</th>
+                            <th>Time</th>
+                            <th>Notes</th>
+                            <th style="text-align:right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <div class="page-actions" data-reveal>
+        <button type="button" onclick="window.location.href='index.html'">Home</button>
+        <button type="button" onclick="window.location.href='daily-tracker.html'">Daily tracker</button>
+    </div>
+</div>
+
+<script src="theme.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script>
+    requireAuth();
+    window.__SHELL_ACTIVE__ = "timetable";
+</script>
+<script src="ui.js"></script>
+<script src="abyss-ui.js"></script>
+<script src="shell.js"></script>
+<script src="motion.js"></script>
+<script src="abyss-fx.js"></script>
+<script>
+    const daySelect = document.getElementById("daySelect");
+    const subjectInput = document.getElementById("subjectInput");
+    const startTimeInput = document.getElementById("startTimeInput");
+    const endTimeInput = document.getElementById("endTimeInput");
+    const notesInput = document.getElementById("notesInput");
+    const addBtn = document.getElementById("addBtn");
+    const loadDayBtn = document.getElementById("loadDayBtn");
+    const loadAllBtn = document.getElementById("loadAllBtn");
+    const itemsBody = document.getElementById("itemsBody");
+
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    function escapeHTML(s) {
+        return String(s)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    function renderItems(items) {
+        itemsBody.innerHTML = "";
+        if (!items || items.length === 0) {
+            itemsBody.innerHTML =
+                '<tr><td colspan="5" class="td-muted" style="padding: 20px; text-align: center;">No blocks yet — add your first slot above.</td></tr>';
+            return;
+        }
+
+        items.forEach((it) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td><strong>${days[it.dayOfWeek]}</strong></td>
+                <td>${escapeHTML(it.subject)}</td>
+                <td class="td-muted">${escapeHTML(it.startTime)} → ${escapeHTML(it.endTime)}</td>
+                <td class="td-muted">${escapeHTML(it.notes || "—")}</td>
+                <td style="text-align:right;"><button type="button" data-del="${it._id}">Remove</button></td>
+            `;
+            row.querySelector("[data-del]").addEventListener("click", async () => {
+                if (!confirm("Remove this block?")) return;
+                await apiFetch(`/api/timetable/${encodeURIComponent(it._id)}`, { method: "DELETE" });
+                await loadTimetable({ dayOfWeek: daySelect.value });
+            });
+            itemsBody.appendChild(row);
+        });
+    }
+
+    async function loadTimetable({ dayOfWeek } = {}) {
+        let url = "/api/timetable";
+        if (dayOfWeek !== undefined) url += `?dayOfWeek=${encodeURIComponent(dayOfWeek)}`;
+        const res = await apiFetch(url);
+        renderItems(res.items || []);
+    }
+
+    addBtn.addEventListener("click", async () => {
+        const payload = {
+            dayOfWeek: daySelect.value,
+            subject: subjectInput.value.trim(),
+            startTime: startTimeInput.value,
+            endTime: endTimeInput.value,
+            notes: notesInput.value.trim(),
+        };
+        if (!payload.subject) return alert("Add a subject or topic label.");
+        if (!payload.startTime || !payload.endTime) return alert("Choose start and end time.");
+
+        await apiFetch("/api/timetable", { method: "POST", body: JSON.stringify(payload) });
+
+        subjectInput.value = "";
+        notesInput.value = "";
+        startTimeInput.value = "";
+        endTimeInput.value = "";
+
+        await loadTimetable({ dayOfWeek: daySelect.value });
+    });
+
+    loadDayBtn.addEventListener("click", () => {
+        loadTimetable({ dayOfWeek: daySelect.value }).catch((err) => alert(err.message || "Failed to load."));
+    });
+
+    loadAllBtn.addEventListener("click", () => {
+        loadTimetable({}).catch((err) => alert(err.message || "Failed to load."));
+    });
+
+    loadTimetable({ dayOfWeek: daySelect.value }).catch((err) => alert(err.message || "Failed to load."));
+</script>
+</body>
+</html>

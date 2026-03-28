@@ -1,0 +1,343 @@
+/* ============================================================
+   Dual theme: Ocean (abyssal tech) vs Forest (biophilic zen)
+   html[data-theme="ocean"] | html[data-theme="forest"]
+   Load after abyss.css
+   ============================================================ */
+
+/* ---------- Atmospheric backdrop (1s cross-fade) ---------- */
+#placement-themes-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -200;
+    pointer-events: none;
+    contain: strict;
+}
+
+#placement-themes-bg .sky-layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.sky-layer--ocean {
+    opacity: 1;
+    background:
+        radial-gradient(ellipse 100% 70% at 50% 100%, rgba(0, 242, 255, 0.06) 0%, transparent 55%),
+        radial-gradient(ellipse 80% 50% at 80% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 45%),
+        linear-gradient(185deg, #010f19 0%, #021d2b 42%, #010812 100%);
+}
+
+html[data-theme="forest"] .sky-layer--ocean {
+    opacity: 0;
+}
+
+.sky-layer--forest {
+    opacity: 0;
+    background-color: #f7f9f7;
+    background-image:
+        radial-gradient(ellipse 140px 90px at 15% 25%, rgba(74, 103, 65, 0.09) 0%, transparent 65%),
+        radial-gradient(ellipse 180px 110px at 70% 60%, rgba(163, 177, 138, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 100px 70px at 85% 15%, rgba(74, 103, 65, 0.06) 0%, transparent 55%),
+        radial-gradient(ellipse 200px 120px at 40% 80%, rgba(163, 177, 138, 0.08) 0%, transparent 58%);
+    background-size:
+        120% 120%,
+        130% 130%,
+        100% 100%,
+        140% 140%;
+    background-position:
+        0% 0%,
+        0% 0%,
+        100% 0%,
+        50% 100%;
+    animation: dappleDrift 48s ease-in-out infinite alternate;
+}
+
+html[data-theme="forest"] .sky-layer--forest {
+    opacity: 1;
+}
+
+@keyframes dappleDrift {
+    0% {
+        background-position:
+            0% 0%,
+            5% 8%,
+            100% 3%,
+            48% 96%;
+    }
+    100% {
+        background-position:
+            4% 6%,
+            12% 2%,
+            94% 10%,
+            55% 88%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sky-layer--forest {
+        animation: none;
+    }
+
+    #placement-themes-bg .sky-layer {
+        transition-duration: 0.01ms;
+    }
+}
+
+/* Body text / surface cross-fade */
+body {
+    transition:
+        color 1s cubic-bezier(0.23, 1, 0.32, 1),
+        background-color 1s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+html[data-theme="forest"] body {
+    color: #1a2f14;
+    background: transparent !important;
+}
+
+html[data-theme="ocean"] body,
+html:not([data-theme]) body {
+    background: transparent;
+}
+
+/* ---------- Ocean: deepen base (spec) ---------- */
+html[data-theme="ocean"] body {
+    color: #e2e8f0;
+}
+
+/* ---------- Forest: sea layers muted ---------- */
+html[data-theme="forest"] .ocean-bg {
+    opacity: 0.22;
+    transition: opacity 1s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+html[data-theme="forest"] .abyss-hue-orbit,
+html[data-theme="forest"] .abyss-caustics,
+html[data-theme="forest"] .abyss-sea-snow,
+html[data-theme="forest"] .ocean-waves,
+html[data-theme="forest"] .ocean-bubbles {
+    opacity: 0.35 !important;
+}
+
+html[data-theme="forest"] .jelly-container,
+html[data-theme="forest"] #particles {
+    opacity: 0.25;
+}
+
+/* ---------- Theme toggle (navbar) ---------- */
+.theme-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0 !important;
+    border-radius: 14px !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
+    flex-shrink: 0;
+    overflow: visible !important;
+    border: 1px solid rgba(0, 255, 255, 0.25) !important;
+    background: rgba(0, 20, 40, 0.45) !important;
+}
+
+.theme-toggle__to-forest,
+.theme-toggle__to-ocean {
+    pointer-events: none;
+}
+
+html[data-theme="ocean"] .theme-toggle .theme-toggle__to-forest {
+    display: inline;
+}
+
+html[data-theme="ocean"] .theme-toggle .theme-toggle__to-ocean {
+    display: none;
+}
+
+html[data-theme="forest"] .theme-toggle .theme-toggle__to-forest {
+    display: none;
+}
+
+html[data-theme="forest"] .theme-toggle .theme-toggle__to-ocean {
+    display: inline;
+}
+
+html[data-theme="forest"] .theme-toggle {
+    border-color: rgba(74, 103, 65, 0.35) !important;
+    background: rgba(255, 255, 255, 0.75) !important;
+    box-shadow: 0 6px 20px rgba(74, 103, 65, 0.12) !important;
+}
+
+/* ---------- Forest: navbar ---------- */
+html[data-theme="forest"] .navbar {
+    background: rgba(255, 255, 255, 0.82) !important;
+    border: 1px solid rgba(163, 177, 138, 0.45) !important;
+    box-shadow:
+        0 20px 40px rgba(45, 62, 40, 0.12),
+        0 1px 0 rgba(255, 255, 255, 0.9) inset !important;
+    backdrop-filter: blur(16px) saturate(1.1) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(1.1) !important;
+}
+
+html[data-theme="forest"] .navbar h2 {
+    color: #2d3e28;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    animation: none !important;
+    filter: none !important;
+}
+
+html[data-theme="forest"] .nav-links span {
+    color: #3d5236;
+}
+
+html[data-theme="forest"] .nav-links span:hover {
+    color: #1a2f14;
+    background: rgba(163, 177, 138, 0.35);
+    text-shadow: none;
+}
+
+html[data-theme="forest"] .nav-links span.nav-link--active {
+    animation: none !important;
+    color: #1a2f14 !important;
+    background: rgba(163, 177, 138, 0.45) !important;
+    border-color: rgba(74, 103, 65, 0.4) !important;
+    box-shadow: 0 4px 14px rgba(45, 62, 40, 0.12) !important;
+}
+
+/* ---------- Forest: typography accents ---------- */
+html[data-theme="forest"] .hero-title,
+html[data-theme="forest"] .page-hero__title {
+    background: linear-gradient(180deg, #2d3e28 0%, #4a6741 45%, #5c7a52 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 8px rgba(45, 62, 40, 0.15));
+}
+
+html[data-theme="forest"] .hero-sub,
+html[data-theme="forest"] .page-hero__lede {
+    color: #4a6741;
+}
+
+html[data-theme="forest"] .section-title {
+    color: #2d3e28;
+    text-shadow: none;
+}
+
+html[data-theme="forest"] .section-title::before {
+    background: #4a6741;
+    box-shadow: 0 2px 8px rgba(74, 103, 65, 0.25);
+}
+
+/* ---------- Forest: cards & glass (white glass + natural shadow) ---------- */
+html[data-theme="forest"] .card,
+html[data-theme="forest"] .glass-box,
+html[data-theme="forest"] .data-panel,
+html[data-theme="forest"] .stat-card,
+html[data-theme="forest"] .timeline-content,
+html[data-theme="forest"] .resource-card,
+html[data-theme="forest"] .chat-shell {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(163, 177, 138, 0.55) !important;
+    backdrop-filter: blur(14px) saturate(1.05) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.05) !important;
+    box-shadow:
+        0 10px 28px rgba(45, 62, 40, 0.08),
+        0 2px 8px rgba(45, 62, 40, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+}
+
+html[data-theme="forest"] .card h3,
+html[data-theme="forest"] .data-panel__title {
+    color: #2d3e28;
+}
+
+html[data-theme="forest"] .card p,
+html[data-theme="forest"] .card .card-desc,
+html[data-theme="forest"] .data-panel__meta {
+    color: #4a5c43;
+}
+
+html[data-theme="forest"] .data-panel__head {
+    background: rgba(247, 249, 247, 0.65) !important;
+    border-bottom-color: rgba(163, 177, 138, 0.4) !important;
+}
+
+html[data-theme="forest"] .data-panel__eyebrow {
+    color: #4a6741;
+}
+
+/* ---------- Forest: hover (no biolume animation) ---------- */
+html[data-theme="forest"] .card:hover,
+html[data-theme="forest"] .card-hitbox:hover > .card,
+html[data-theme="forest"] .glass-box:hover,
+html[data-theme="forest"] .data-panel:hover {
+    filter: none !important;
+    animation: none !important;
+    border-color: rgba(74, 103, 65, 0.55) !important;
+    box-shadow:
+        0 18px 36px rgba(45, 62, 40, 0.12),
+        0 4px 12px rgba(45, 62, 40, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.98) !important;
+}
+
+html[data-theme="forest"] .username-label {
+    color: #3d5236;
+}
+
+html[data-theme="forest"] a {
+    color: #4a6741;
+}
+
+/* ---------- Forest: inputs & tables ---------- */
+html[data-theme="forest"] input,
+html[data-theme="forest"] select,
+html[data-theme="forest"] textarea {
+    background: rgba(255, 255, 255, 0.92);
+    color: #1a2f14;
+    border-color: rgba(163, 177, 138, 0.55);
+    box-shadow: inset 0 2px 6px rgba(45, 62, 40, 0.06);
+}
+
+html[data-theme="forest"] .table-pro thead th {
+    color: #2d3e28;
+    background: rgba(247, 249, 247, 0.95);
+    border-bottom-color: rgba(163, 177, 138, 0.45);
+}
+
+html[data-theme="forest"] .table-pro tbody td {
+    color: #2d3e28;
+}
+
+/* ---------- Forest: motion.css page hero eyebrow ---------- */
+html[data-theme="forest"] .page-hero__eyebrow {
+    color: #4a6741;
+    border-color: rgba(163, 177, 138, 0.45);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* ---------- Dive overlay adapts --------- */
+html[data-theme="forest"] #abyss-dive-overlay {
+    background: radial-gradient(circle at 50% 42%, transparent 0%, rgba(247, 249, 247, 0.25) 38%, rgba(232, 236, 228, 0.94) 100%);
+}
+
+/* ---------- Forest ripple ---------- */
+html[data-theme="forest"] .abyss-ripple {
+    background: radial-gradient(circle, rgba(74, 103, 65, 0.35) 0%, rgba(163, 177, 138, 0.2) 50%, transparent 70%);
+    mix-blend-mode: multiply;
+}
+
+/* ---------- Forest: mobile nav sheet ---------- */
+@media (max-width: 900px) {
+    html[data-theme="forest"] .nav-links {
+        background: rgba(255, 255, 255, 0.97) !important;
+        border-bottom: 2px solid rgba(163, 177, 138, 0.45) !important;
+        box-shadow: 0 20px 40px rgba(45, 62, 40, 0.12) !important;
+    }
+
+    html[data-theme="forest"] .nav-links span {
+        color: #3d5236 !important;
+        border-bottom-color: rgba(163, 177, 138, 0.35) !important;
+    }
+}

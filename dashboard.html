@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topics — Placement OS</title>
+    <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("placement_os_theme")||"ocean");}catch(e){document.documentElement.setAttribute("data-theme","ocean");}</script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="motion.css">
+    <link rel="stylesheet" href="abyss.css">
+    <link rel="stylesheet" href="themes.css">
+</head>
+<body>
+<div class="container main-with-nav">
+    <header class="page-hero page-hero--animate" data-parallax="0.08">
+        <div class="page-hero__glow" aria-hidden="true"></div>
+        <p class="page-hero__eyebrow">Curriculum</p>
+        <h1 class="page-hero__title">
+            <span class="page-hero__line"><span class="page-hero__line-inner">Choose a track</span></span>
+        </h1>
+        <p class="page-hero__lede">Each card opens the topic list for that domain — roadmaps, checklists, and per-topic study pages load from your backend.</p>
+    </header>
+
+    <section class="data-panel" data-reveal>
+        <div class="data-panel__head">
+            <div>
+                <div class="data-panel__eyebrow">Domains</div>
+                <h2 class="data-panel__title">Sections</h2>
+                <p class="data-panel__meta">Pick where you want depth today. DSA uses the dedicated dsa.html hub; everything else goes through the dynamic topic grid.</p>
+            </div>
+        </div>
+        <div class="data-panel__body">
+            <div class="cards dash-grid" id="cardsContainer" data-reveal-stagger></div>
+        </div>
+    </section>
+
+    <div class="page-actions" data-reveal>
+        <button id="homeBtn" type="button">Home</button>
+    </div>
+</div>
+
+<script src="theme.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script>
+    requireAuth();
+    window.__SHELL_ACTIVE__ = "dashboard";
+</script>
+<script src="ui.js"></script>
+<script src="abyss-ui.js"></script>
+<script src="shell.js"></script>
+<script src="motion.js"></script>
+<script src="abyss-fx.js"></script>
+<script>
+    const sections = [
+        { name: "Aptitude", key: "aptitude", icon: "🧠", link: "details.html", sub: "Quant, logic, verbal" },
+        { name: "DSA", key: "dsa", icon: "💻", link: "dsa.html", sub: "Curated problem track" },
+        { name: "Academics", key: "academics", icon: "📚", link: "details.html", sub: "OS, DBMS, networks" },
+        { name: "Web Dev", key: "webdev", icon: "🌐", link: "details.html", sub: "Frontend &amp; JS ecosystem" },
+        { name: "Full Stack", key: "fullstack", icon: "🧩", link: "details.html", sub: "End-to-end systems" },
+        { name: "Java", key: "java", icon: "☕", link: "details.html", sub: "Backend &amp; Spring" },
+        { name: "Python", key: "python", icon: "🐍", link: "details.html", sub: "APIs &amp; tooling" },
+        { name: "Cloud", key: "cloudengineer", icon: "☁️", link: "details.html", sub: "AWS-style primitives" },
+        { name: "DevOps", key: "devops", icon: "⚙️", link: "details.html", sub: "CI/CD &amp; K8s" },
+        { name: "Machine Learning", key: "ml", icon: "🤖", link: "details.html", sub: "Models &amp; metrics" },
+        { name: "Data Science", key: "datascience", icon: "📈", link: "details.html", sub: "EDA &amp; stats" },
+        { name: "Soft skills & HR", key: "softskills", icon: "🤝", link: "details.html", sub: "STAR &amp; presence" },
+    ];
+
+    const container = document.getElementById("cardsContainer");
+    const homeBtn = document.getElementById("homeBtn");
+
+    sections.forEach(section => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.setAttribute("data-tilt", "");
+        card.innerHTML = `
+            <h3>${section.icon} ${section.name}</h3>
+            <p class="dash-card__sub">${section.sub}</p>
+        `;
+
+        card.addEventListener("click", () => {
+            localStorage.setItem("section", section.key);
+            window.location.href = section.link;
+        });
+
+        container.appendChild(card);
+    });
+
+    homeBtn.addEventListener("click", () => {
+        diveTo("index.html");
+    });
+</script>
+</body>
+</html>

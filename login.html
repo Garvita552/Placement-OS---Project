@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Placement OS</title>
+    <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("placement_os_theme")||"ocean");}catch(e){document.documentElement.setAttribute("data-theme","ocean");}</script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="abyss.css">
+    <link rel="stylesheet" href="themes.css">
+</head>
+
+<body>
+
+<!-- 🌊 OCEAN BACKGROUND SYSTEM -->
+<div class="ocean-bg">
+    <div class="abyss-hue-orbit" aria-hidden="true"></div>
+    <canvas class="abyss-caustics" id="abyssCaustics" aria-hidden="true"></canvas>
+    <canvas class="abyss-sea-snow" id="abyssSeaSnow" aria-hidden="true"></canvas>
+    <div class="ocean-waves" aria-hidden="true"></div>
+    <div class="ocean-bubbles" aria-hidden="true"></div>
+    <canvas id="particles"></canvas>
+    <div class="jelly-container">
+        <div class="jelly"></div>
+        <div class="jelly"></div>
+    </div>
+    <div class="cursor-glow"></div>
+</div>
+
+<div class="container">
+    <h1 class="hero-title">🪼 Placement OS</h1>
+    <p class="hero-sub">Login or register to start your preparation journey</p>
+
+    <div class="glass-box" style="width: min(720px, 95vw); margin-top: 25px;">
+        <!-- Connection Status Indicator -->
+        <div id="connectionStatus" style="text-align: center; margin-bottom: 15px; padding: 8px; border-radius: 8px; background: rgba(255, 255, 255, 0.1);">
+            <span id="statusText">🔄 Checking connection...</span>
+        </div>
+        
+        <div class="input-section" style="justify-content:center; margin-bottom: 15px;">
+            <button id="tabLogin" style="opacity: 1;" type="button">Login</button>
+            <button id="tabRegister" style="opacity: 0.7;" type="button">Register</button>
+        </div>
+
+        <div id="loginBox">
+            <h2 style="text-align:center; margin-bottom: 12px;">Login</h2>
+            <div class="input-section" style="justify-content:center;">
+                <input id="loginUsername" placeholder="Username" />
+                <input id="loginPassword" placeholder="Password" type="password" />
+                <button id="loginBtn" type="button">Login</button>
+            </div>
+            <p id="loginMsg" style="margin-top: 12px; text-align:center; opacity: 0.9;"></p>
+        </div>
+
+        <div id="registerBox" style="display:none;">
+            <h2 style="text-align:center; margin-bottom: 12px;">Register</h2>
+            <div class="input-section" style="justify-content:center;">
+                <input id="registerUsername" placeholder="Username" />
+                <input id="registerPassword" placeholder="Password (min 6 chars)" type="password" />
+                <button id="registerBtn" type="button">Create Account</button>
+            </div>
+            <p id="registerMsg" style="margin-top: 12px; text-align:center; opacity: 0.9;"></p>
+        </div>
+    </div>
+    <div style="text-align:center; margin-top: 18px; opacity: 0.85; max-width: 520px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+        <strong>How to log in:</strong> In a terminal run <code style="color:#67e8f9;">cd backend</code> then <code style="color:#67e8f9;">npm start</code>.
+        Start <strong>MongoDB</strong> first (Windows: Services → “MongoDB”). Then open
+        <a href="http://localhost:3000/login.html" style="color:#00f5ff;">http://localhost:3000/login.html</a>
+        or keep using Live Server — both work once the API is running on port 3000.
+    </div>
+</div>
+
+<script src="theme.js"></script>
+<script src="api.js"></script>
+<script src="ui.js"></script>
+<script src="abyss-ui.js"></script>
+<script src="abyss-fx.js"></script>
+
+<script>
+    // If already logged in, go to home.
+    if (localStorage.getItem("authToken")) {
+        window.location.href = "index.html";
+    }
+
+    const tabLogin = document.getElementById("tabLogin");
+    const tabRegister = document.getElementById("tabRegister");
+    const loginBox = document.getElementById("loginBox");
+    const registerBox = document.getElementById("registerBox");
+
+    function showLogin() {
+        loginBox.style.display = "block";
+        registerBox.style.display = "none";
+        tabLogin.style.opacity = 1;
+        tabRegister.style.opacity = 0.7;
+    }
+    function showRegister() {
+        loginBox.style.display = "none";
+        registerBox.style.display = "block";
+        tabLogin.style.opacity = 0.7;
+        tabRegister.style.opacity = 1;
+    }
+
+    tabLogin.addEventListener("click", showLogin);
+    tabRegister.addEventListener("click", showRegister);
+
+    async function handleLogin() {
+    const username = document.getElementById("loginUsername").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+    const msgEl = document.getElementById("loginMsg");
+    const loginBtn = document.getElementById("loginBtn");
+    
+    // Clear previous messages
+    msgEl.textContent = "";
+    msgEl.style.color = "";
+    
+    // Validation
+    if (!username) {
+        msgEl.textContent = "⚠️ Username required";
+        msgEl.style.color = "#ff6b6b";
+        return;
+    }
+    if (!password) {
+        msgEl.textContent = "⚠️ Password required";
+        msgEl.style.color = "#ff6b6b";
+        return;
+    }
+    
+    // Show loading state
+    loginBtn.disabled = true;
+    loginBtn.textContent = "🔄 Logging in...";
+    msgEl.textContent = "🔄 Connecting to server...";
+    msgEl.style.color = "#00f5ff";
+
+    try {
+        let health;
+        try {
+            health = await apiFetch("/api/health");
+        } catch (healthErr) {
+            throw new Error(
+                "🔴 Cannot reach the API. From the Project folder run: cd backend → npm start. Then use http://localhost:3000/login.html or refresh this page."
+            );
+        }
+        if (!health.dbConnected) {
+            throw new Error(
+                "⚠️ API is running but MongoDB is not connected. Start the MongoDB service, then restart the backend (Ctrl+C, then npm start in backend)."
+            );
+        }
+
+        const data = await apiFetch("/api/auth/login", {
+            method: "POST",
+            body: JSON.stringify({ username, password }),
+        });
+        
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("authUser", data.user.username);
+        
+        msgEl.textContent = "✅ Login successful! Redirecting...";
+        msgEl.style.color = "#4ade80";
+        
+        // Redirect after success
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 1000);
+        
+    } catch (e) {
+        console.error("Login error:", e);
+        
+        // User-friendly error messages
+        let userMessage = e.message || "Login failed";
+        
+        if (userMessage.includes("401")) {
+            userMessage = "❌ Invalid username or password";
+        } else if (userMessage.includes("400")) {
+            userMessage = "⚠️ Please check your credentials";
+        } else if (userMessage.includes("fetch") || userMessage.includes("network")) {
+            userMessage = "🔴 Network error. Check if backend server is running on localhost:3000";
+        }
+        
+        msgEl.textContent = userMessage;
+        msgEl.style.color = "#ff6b6b";
+        
+    } finally {
+        // Reset button state
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Login";
+    }
+}
+
+    async function handleRegister() {
+    const username = document.getElementById("registerUsername").value.trim();
+    const password = document.getElementById("registerPassword").value.trim();
+    const msgEl = document.getElementById("registerMsg");
+    const registerBtn = document.getElementById("registerBtn");
+    
+    // Clear previous messages
+    msgEl.textContent = "";
+    msgEl.style.color = "";
+    
+    // Validation
+    if (!username || username.length < 3) {
+        msgEl.textContent = "⚠️ Username must be at least 3 characters";
+        msgEl.style.color = "#ff6b6b";
+        return;
+    }
+    if (!password || password.length < 6) {
+        msgEl.textContent = "⚠️ Password must be at least 6 characters";
+        msgEl.style.color = "#ff6b6b";
+        return;
+    }
+    
+    // Show loading state
+    registerBtn.disabled = true;
+    registerBtn.textContent = "🔄 Creating account...";
+    msgEl.textContent = "🔄 Connecting to server...";
+    msgEl.style.color = "#00f5ff";
+
+    try {
+        let health;
+        try {
+            health = await apiFetch("/api/health");
+        } catch (healthErr) {
+            throw new Error(
+                "🔴 Cannot reach the API. From the Project folder run: cd backend → npm start. Then use http://localhost:3000/login.html or refresh this page."
+            );
+        }
+        if (!health.dbConnected) {
+            throw new Error(
+                "⚠️ API is running but MongoDB is not connected. Start the MongoDB service, then restart the backend (Ctrl+C, then npm start in backend)."
+            );
+        }
+
+        const data = await apiFetch("/api/auth/register", {
+            method: "POST",
+            body: JSON.stringify({ username, password }),
+        });
+        
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("authUser", data.user.username);
+        
+        msgEl.textContent = "✅ Account created! Redirecting...";
+        msgEl.style.color = "#4ade80";
+        
+        // Redirect after success
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 1000);
+        
+    } catch (e) {
+        console.error("Register error:", e);
+        
+        // User-friendly error messages
+        let userMessage = e.message || "Registration failed";
+        
+        if (userMessage.includes("409")) {
+            userMessage = "❌ Username already exists. Try another one.";
+        } else if (userMessage.includes("400")) {
+            userMessage = "⚠️ Please check your input details";
+        } else if (userMessage.includes("fetch") || userMessage.includes("network")) {
+            userMessage = "🔴 Network error. Check if backend server is running on localhost:3000";
+        }
+        
+        msgEl.textContent = userMessage;
+        msgEl.style.color = "#ff6b6b";
+        
+    } finally {
+        // Reset button state
+        registerBtn.disabled = false;
+        registerBtn.textContent = "Create Account";
+    }
+}
+
+    // Add enter key support for login
+    document.getElementById("loginUsername").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            document.getElementById("loginPassword").focus();
+        }
+    });
+    
+    document.getElementById("loginPassword").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            handleLogin();
+        }
+    });
+    
+    // Add enter key support for register
+    document.getElementById("registerUsername").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            document.getElementById("registerPassword").focus();
+        }
+    });
+    
+    document.getElementById("registerPassword").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            handleRegister();
+        }
+    });
+    
+    // Focus on first input when page loads
+    window.addEventListener("load", () => {
+        document.getElementById("loginUsername").focus();
+    });
+
+    document.getElementById("loginBtn").addEventListener("click", handleLogin);
+    document.getElementById("registerBtn").addEventListener("click", handleRegister);
+
+    // Add connection status indicator
+    async function checkBackendConnection() {
+        const statusEl = document.getElementById("connectionStatus");
+        const statusText = document.getElementById("statusText");
+
+        try {
+            const h = await apiFetch("/api/health");
+            if (h.dbConnected) {
+                statusText.textContent = "✅ Backend and MongoDB ready — you can log in";
+                statusEl.style.background = "rgba(74, 222, 128, 0.2)";
+                statusEl.style.border = "1px solid rgba(74, 222, 128, 0.5)";
+                return true;
+            }
+            statusText.textContent =
+                "⚠️ API is up — start MongoDB, then restart backend (npm start in backend folder)";
+            statusEl.style.background = "rgba(250, 204, 21, 0.15)";
+            statusEl.style.border = "1px solid rgba(250, 204, 21, 0.45)";
+            return false;
+        } catch (e) {
+            statusText.textContent =
+                "🔴 API not reachable — open a terminal: cd backend → npm start";
+            statusEl.style.background = "rgba(255, 107, 107, 0.2)";
+            statusEl.style.border = "1px solid rgba(255, 107, 107, 0.5)";
+            console.warn("⚠️ Backend not connected:", e.message);
+            return false;
+        }
+    }
+    
+    // Check connection on page load
+    checkBackendConnection();
+
+    const canvas = document.getElementById("particles");
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const coarsePointer = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+    if (canvas && !reduceMotion) {
+        const ctx = canvas.getContext("2d");
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const count = coarsePointer || window.innerWidth < 768 ? 28 : 48;
+        let particles = [];
+        function resize() {
+            canvas.width = Math.floor(window.innerWidth * dpr);
+            canvas.height = Math.floor(window.innerHeight * dpr);
+            canvas.style.width = window.innerWidth + "px";
+            canvas.style.height = window.innerHeight + "px";
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            particles = [];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * window.innerHeight,
+                    s: 0.5 + Math.random() * 1.4,
+                    v: 0.2 + Math.random() * 0.5,
+                });
+            }
+        }
+        resize();
+        window.addEventListener("resize", resize, { passive: true });
+        function frame() {
+            if (document.hidden) {
+                requestAnimationFrame(frame);
+                return;
+            }
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = "rgba(160, 235, 255, 0.12)";
+            for (const p of particles) {
+                p.y -= p.v;
+                if (p.y < -4) p.y = h + 4;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+    }
+
+    const glow = document.querySelector(".cursor-glow");
+    if (glow && !reduceMotion && !coarsePointer) {
+        document.addEventListener(
+            "mousemove",
+            (e) => {
+                glow.style.left = e.clientX + "px";
+                glow.style.top = e.clientY + "px";
+            },
+            { passive: true }
+        );
+    } else if (glow) {
+        glow.style.display = "none";
+    }
+</script>
+
+</body>
+</html>

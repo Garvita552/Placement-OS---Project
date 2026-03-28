@@ -1,0 +1,111 @@
+/**
+ * Placement OS — polish layer (Wildcatter / Buzzworthy feel)
+ * Load LAST. Theme = html[data-theme="ocean"|"forest"] + CSS variables only.
+ */
+
+:root {
+    --polish-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --polish-dur: 0.5s;
+    --card-glass-inset-ocean:
+        inset 0 1px 0 rgba(255, 255, 255, 0.12),
+        inset 0 0 40px rgba(0, 245, 255, 0.08),
+        inset 0 -12px 48px rgba(0, 8, 20, 0.65);
+    --card-hover-glow-ocean:
+        0 28px 60px rgba(0, 0, 0, 0.72),
+        0 0 48px rgba(34, 211, 238, 0.22),
+        0 0 80px rgba(99, 102, 241, 0.08);
+    --surface-forest-cream: #faf8f3;
+    --forest-green: #2d5016;
+    --earth-brown: #5c4033;
+    --sage-muted: #8fa87d;
+    --card-glass-inset-forest:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -8px 32px rgba(92, 64, 51, 0.06);
+    --card-hover-glow-forest:
+        0 22px 48px rgba(45, 80, 22, 0.12),
+        0 8px 24px rgba(92, 64, 51, 0.1);
+}
+
+html[data-theme="ocean"] {
+    --card-glass-inset: var(--card-glass-inset-ocean);
+    --card-hover-glow: var(--card-hover-glow-ocean);
+    --accent-border-hover: rgba(34, 211, 238, 0.5);
+}
+
+html[data-theme="forest"] {
+    --card-glass-inset: var(--card-glass-inset-forest);
+    --card-hover-glow: var(--card-hover-glow-forest);
+    --accent-border-hover: rgba(45, 80, 22, 0.45);
+}
+
+/* Subtle moving-water read on ocean sky (no layout impact) */
+#placement-themes-bg .sky-layer--ocean {
+    transform-origin: 50% 50%;
+    animation: polishOceanMesh 26s ease-in-out infinite alternate;
+}
+
+@keyframes polishOceanMesh {
+    0% {
+        filter: hue-rotate(0deg) brightness(1);
+        transform: scale(1);
+    }
+    100% {
+        filter: hue-rotate(14deg) brightness(1.04);
+        transform: scale(1.03);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #placement-themes-bg .sky-layer--ocean {
+        animation: none;
+    }
+}
+
+/* Outer trigger hovers the inner card — stable bounds (.card-hitbox / .card-trigger from ui.js) */
+.card-hitbox:hover > .card,
+.card-trigger:hover > .card,
+.card.hovering,
+.resource-card.hovering,
+.glass-box.hovering {
+    border-color: var(--accent-border-hover, rgba(34, 211, 238, 0.45)) !important;
+    box-shadow: var(--card-glass-inset), var(--card-hover-glow) !important;
+    filter: brightness(1.05) saturate(1.05);
+    transition:
+        border-color var(--polish-dur) var(--polish-ease),
+        box-shadow var(--polish-dur) var(--polish-ease),
+        filter var(--polish-dur) var(--polish-ease) !important;
+}
+
+.card,
+.resource-card,
+.glass-box {
+    box-shadow: var(--shadow-float, var(--card-hover-glow)), var(--card-glass-inset);
+    transition:
+        border-color var(--polish-dur) var(--polish-ease),
+        box-shadow var(--polish-dur) var(--polish-ease),
+        filter var(--polish-dur) var(--polish-ease) !important;
+}
+
+html[data-theme="forest"] .sky-layer--forest {
+    background-color: var(--surface-forest-cream);
+    background-image:
+        radial-gradient(ellipse 160px 100px at 18% 22%, rgba(45, 80, 22, 0.07) 0%, transparent 65%),
+        radial-gradient(ellipse 200px 120px at 72% 58%, rgba(92, 64, 51, 0.06) 0%, transparent 58%),
+        radial-gradient(ellipse 120px 80px at 88% 12%, rgba(143, 168, 125, 0.1) 0%, transparent 55%),
+        radial-gradient(ellipse 220px 140px at 42% 82%, rgba(45, 80, 22, 0.05) 0%, transparent 60%);
+    background-size: 120% 120%, 130% 130%, 100% 100%, 140% 140%;
+    background-position: 0% 0%, 0% 0%, 100% 0%, 50% 100%;
+    animation: dappleDrift 48s ease-in-out infinite alternate;
+}
+
+html[data-theme="forest"] body {
+    color: var(--forest-green);
+}
+
+html[data-theme="forest"] a {
+    color: var(--forest-green);
+}
+
+html[data-theme="forest"] a:hover {
+    color: var(--earth-brown);
+}

@@ -1,0 +1,329 @@
+/* ================= IMMERSIVE THEME STYLES ================= */
+/* Theme Provider CSS for Ocean Abyss and Biophilic Forest */
+
+/* ================= THEME ROOT VARIABLES ================= */
+:root {
+    /* Ocean Theme Colors */
+    --ocean-primary: #001220;
+    --ocean-secondary: #000814;
+    --ocean-accent: #00f5ff;
+    --ocean-glow: rgba(0, 245, 255, 0.6);
+    --ocean-surface: rgba(0, 40, 60, 0.3);
+    --ocean-border: rgba(0, 245, 255, 0.3);
+    
+    /* Forest Theme Colors */
+    --forest-primary: #0d2818;
+    --forest-secondary: #1a3d2e;
+    --forest-accent: #52b788;
+    --forest-glow: rgba(82, 183, 136, 0.6);
+    --forest-surface: rgba(34, 139, 34, 0.3);
+    --forest-border: rgba(82, 183, 136, 0.3);
+    
+    /* Shared Variables */
+    --transition-duration: 0.8s;
+    --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ================= OCEAN THEME ================= */
+.theme-ocean {
+    --theme-primary: var(--ocean-primary);
+    --theme-secondary: var(--ocean-secondary);
+    --theme-accent: var(--ocean-accent);
+    --theme-glow: var(--ocean-glow);
+    --theme-surface: var(--ocean-surface);
+    --theme-border: var(--ocean-border);
+}
+
+.theme-ocean body {
+    background: linear-gradient(180deg, var(--ocean-primary) 0%, var(--ocean-secondary) 100%);
+    color: #e2e8f0;
+}
+
+.theme-ocean .navbar {
+    background: rgba(0, 10, 20, 0.8);
+    border-bottom: 1px solid var(--ocean-border);
+    backdrop-filter: blur(30px);
+}
+
+.theme-ocean .card {
+    background: var(--ocean-surface);
+    border: 2px solid var(--ocean-border);
+    box-shadow: 0 30px 50px -10px rgba(0,0,0,0.8), 0 0 20px var(--ocean-glow);
+}
+
+.theme-ocean .glass-box {
+    background: rgba(0, 20, 35, 0.6);
+    border: 1px solid var(--ocean-border);
+}
+
+/* ================= FOREST THEME ================= */
+.theme-forest {
+    --theme-primary: var(--forest-primary);
+    --theme-secondary: var(--forest-secondary);
+    --theme-accent: var(--forest-accent);
+    --theme-glow: var(--forest-glow);
+    --theme-surface: var(--forest-surface);
+    --theme-border: var(--forest-border);
+}
+
+.theme-forest body {
+    background: linear-gradient(180deg, var(--forest-primary) 0%, var(--forest-secondary) 100%);
+    color: #f0f9f0;
+}
+
+.theme-forest .navbar {
+    background: rgba(13, 40, 24, 0.8);
+    border-bottom: 1px solid var(--forest-border);
+    backdrop-filter: blur(30px);
+}
+
+.theme-forest .card {
+    background: var(--forest-surface);
+    border: 2px solid var(--forest-border);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.theme-forest .glass-box {
+    background: rgba(13, 40, 24, 0.6);
+    border: 1px solid var(--forest-border);
+}
+
+/* ================= THEME TOGGLE BUTTON ================= */
+.theme-toggle {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border: 2px solid var(--theme-border);
+    border-radius: 50%;
+    background: var(--theme-surface);
+    backdrop-filter: blur(20px);
+    cursor: pointer;
+    transition: all var(--transition-duration) var(--transition-easing);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    overflow: hidden;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1) rotate(180deg);
+    box-shadow: 0 0 30px var(--theme-glow);
+}
+
+.theme-toggle__to-forest,
+.theme-toggle__to-ocean {
+    position: absolute;
+    transition: all var(--transition-duration) var(--transition-easing);
+}
+
+.theme-ocean .theme-toggle__to-forest {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.theme-ocean .theme-toggle__to-ocean {
+    opacity: 0;
+    transform: scale(0);
+}
+
+.theme-forest .theme-toggle__to-forest {
+    opacity: 0;
+    transform: scale(0);
+}
+
+.theme-forest .theme-toggle__to-ocean {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ================= 3D BACKGROUND CANVAS ================= */
+.abyss-caustics,
+.abyss-sea-snow,
+#forestSunlight {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -10;
+    mix-blend-mode: screen;
+}
+
+.abyss-caustics {
+    opacity: 0.6;
+    filter: blur(2px);
+}
+
+.abyss-sea-snow {
+    opacity: 0.8;
+    filter: blur(1px);
+}
+
+#forestSunlight {
+    opacity: 0.7;
+    mix-blend-mode: soft-light;
+}
+
+/* ================= FOREST CANOPY ================= */
+.forest-canopy {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -5;
+    background: radial-gradient(ellipse at center top, 
+        rgba(34, 139, 34, 0.1) 0%, 
+        rgba(0, 100, 0, 0.3) 100%);
+}
+
+/* ================= FOREST PARTICLES ================= */
+.forest-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -4;
+}
+
+.forest-particle {
+    position: absolute;
+    background: rgba(139, 69, 19, 0.6);
+    border-radius: 50%;
+    animation: fall 15s linear infinite;
+}
+
+.forest-particle:nth-child(even) {
+    background: rgba(255, 255, 200, 0.4);
+    border-radius: 0%;
+    animation: sway 12s ease-in-out infinite;
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(100vh) rotate(360deg);
+    }
+}
+
+@keyframes sway {
+    0%, 100% { transform: translateX(0) translateY(100vh) rotate(0deg); }
+    25% { transform: translateX(20px) translateY(75vh) rotate(90deg); }
+    50% { transform: translateX(-10px) translateY(50vh) rotate(180deg); }
+    75% { transform: translateX(15px) translateY(25vh) rotate(270deg); }
+}
+
+/* ================= PAGE TRANSITION OVERLAY ================= */
+.page-transition-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+/* ================= BIOLUMINESCENCE EFFECTS ================= */
+.theme-ocean .card {
+    animation: bioluminescence 4s ease-in-out infinite;
+}
+
+@keyframes bioluminescence {
+    0%, 100% { 
+        box-shadow: 0 30px 50px -10px rgba(0,0,0,0.8), 
+                   0 0 20px var(--ocean-glow);
+    }
+    50% { 
+        box-shadow: 0 40px 70px -10px rgba(0,0,0,0.9), 
+                   0 0 40px var(--ocean-glow), 
+                   0 0 60px rgba(0, 200, 255, 0.4);
+    }
+}
+
+/* ================= ORGANIC SHADOWS ================= */
+.theme-forest .card {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 
+                0 10px 20px rgba(0, 0, 0, 0.2), 
+                0 5px 10px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ================= THEME-SPECIFIC TYPOGRAPHY ================= */
+.theme-ocean .hero-title {
+    background: linear-gradient(to bottom, #ffffff, var(--ocean-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 10px 20px var(--ocean-glow);
+}
+
+.theme-forest .hero-title {
+    background: linear-gradient(to bottom, #ffffff, var(--forest-accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 10px 20px var(--forest-glow);
+}
+
+/* ================= LIGHT MODE SUPPORT ================= */
+.light-mode {
+    --ocean-primary: #f0f9ff;
+    --ocean-secondary: #e0f2fe;
+    --forest-primary: #f0fdf4;
+    --forest-secondary: #dcfce7;
+}
+
+.light-mode.theme-ocean body {
+    color: #0f172a;
+}
+
+.light-mode.theme-forest body {
+    color: #14532d;
+}
+
+.light-mode .navbar {
+    background: rgba(255, 255, 255, 0.9) !important;
+}
+
+.light-mode .card {
+    background: rgba(255, 255, 255, 0.8) !important;
+    color: #0f172a !important;
+}
+
+/* ================= RESPONSIVE THEME ADJUSTMENTS ================= */
+@media (max-width: 768px) {
+    .theme-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .abyss-caustics,
+    .abyss-sea-snow,
+    #forestSunlight {
+        opacity: 0.4;
+    }
+    
+    .forest-particles {
+        display: none;
+    }
+}
+
+/* ================= PERFORMANCE OPTIMIZATIONS ================= */
+@media (prefers-reduced-motion: reduce) {
+    .theme-toggle,
+    .card,
+    .forest-particle {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    .page-transition-overlay {
+        transition: none !important;
+    }
+}

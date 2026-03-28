@@ -1,0 +1,364 @@
+/* ================= SMOOTH SCROLL & TEXT ANIMATION STYLES ================= */
+
+/* ================= SMOOTH SCROLL BASE ================= */
+html {
+    scroll-behavior: auto;
+    --scroll-progress: 0;
+    --scroll-y: 0px;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+body.is-smooth-scrolling {
+    pointer-events: none;
+}
+
+body.is-smooth-scrolling * {
+    pointer-events: auto;
+}
+
+/* ================= PARALLAX ELEMENTS ================= */
+[data-parallax] {
+    transform: translateY(0);
+    will-change: transform;
+}
+
+/* ================= TEXT ANIMATION BASE ================= */
+[data-reveal] span,
+[data-split-text] span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+[data-reveal].revealed span,
+[data-split-text].revealed span {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ================= HERO TITLE ANIMATION ================= */
+.hero-word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(50px) rotateX(90deg);
+    transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+/* ================= SPLIT TEXT ANIMATIONS ================= */
+.split-char {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(20px) rotateX(90deg);
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.split-word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(30px) rotateX(45deg);
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.split-line {
+    display: block;
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ================= SCROLL TRIGGER ANIMATIONS ================= */
+[data-scroll-trigger] {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+[data-scroll-trigger="slideInLeft"] {
+    transform: translateX(-100px);
+}
+
+[data-scroll-trigger="slideInRight"] {
+    transform: translateX(100px);
+}
+
+[data-scroll-trigger="scaleIn"] {
+    transform: scale(0.8);
+    opacity: 0;
+}
+
+[data-scroll-trigger="rotateIn"] {
+    transform: rotate(-45deg) scale(0.8);
+    opacity: 0;
+}
+
+.scroll-animated {
+    opacity: 1 !important;
+    transform: translateY(0) translateX(0) scale(1) rotate(0deg) !important;
+}
+
+/* ================= TEXT HOVER EFFECTS ================= */
+[data-text-hover="glow"] {
+    transition: text-shadow 0.3s ease;
+}
+
+[data-text-hover="wave"] span {
+    transition: transform 0.3s ease;
+}
+
+[data-text-hover="scale"] {
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+[data-text-hover="rainbow"] {
+    transition: all 0.3s ease;
+}
+
+/* ================= TYPEWRITER EFFECT ================= */
+[data-typewriter] {
+    font-family: 'Courier New', monospace;
+    border-right: 2px solid var(--theme-accent, #00f5ff);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { border-color: var(--theme-accent, #00f5ff); }
+    51%, 100% { border-color: transparent; }
+}
+
+/* ================= COUNTER ANIMATION ================= */
+[data-counter] {
+    font-variant-numeric: tabular-nums;
+    font-weight: bold;
+}
+
+/* ================= MORPHING TEXT ================= */
+[data-morph] {
+    display: inline-block;
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+
+/* ================= CURSOR BUBBLE PARTICLES ================= */
+.cursor-bubble-particle {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background: radial-gradient(circle, rgba(0, 245, 255, 0.8), transparent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    animation: bubble-rise 1s ease-out forwards;
+}
+
+@keyframes bubble-rise {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -150%) scale(1);
+        opacity: 0;
+    }
+}
+
+/* ================= CURSOR LEAF PARTICLES ================= */
+.cursor-leaf-particle {
+    position: fixed;
+    width: 6px;
+    height: 3px;
+    background: linear-gradient(45deg, #52b788, #2d6a4f);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    animation: leaf-fall 1s ease-out forwards;
+}
+
+@keyframes leaf-fall {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, 100px) scale(1) rotate(180deg);
+        opacity: 0;
+    }
+}
+
+/* ================= RAINBOW TEXT ANIMATION ================= */
+@keyframes rainbow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+/* ================= ENHANCED SECTION TITLES ================= */
+.section-title {
+    position: relative;
+    overflow: hidden;
+}
+
+.section-title[data-split-text="words"] .split-word {
+    position: relative;
+}
+
+.section-title[data-split-text="words"] .split-word::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--theme-accent, #00f5ff);
+    transition: width 0.3s ease;
+}
+
+.section-title[data-split-text="words"].revealed .split-word::after {
+    width: 100%;
+}
+
+/* ================= CARD ENTRANCE ANIMATIONS ================= */
+.card[data-scroll-trigger] {
+    transform: translateY(100px) rotateX(45deg);
+    opacity: 0;
+    transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-style: preserve-3d;
+}
+
+.card[data-scroll-trigger].scroll-animated {
+    transform: translateY(0) rotateX(0deg);
+    opacity: 1;
+}
+
+/* ================= STAGGERED CARD ANIMATIONS ================= */
+.cards .card {
+    transition-delay: calc(var(--stagger, 0) * 0.1s);
+}
+
+.cards .card[data-scroll-trigger] {
+    transform: translateY(50px) scale(0.9);
+    opacity: 0;
+}
+
+/* ================= NAVBAR ANIMATIONS ================= */
+.navbar {
+    transition: all 0.3s ease;
+    backdrop-filter: blur(30px);
+}
+
+.navbar.scrolled {
+    background: rgba(0, 10, 20, 0.95);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* ================= FLOATING ANIMATIONS ================= */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes float-delayed {
+    0%, 100% { transform: translateY(0); }
+    25% { transform: translateY(-5px); }
+    75% { transform: translateY(-15px); }
+}
+
+/* ================= RIPPLE EFFECT ================= */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.ripple-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-effect::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: var(--theme-glow, rgba(0, 245, 255, 0.3));
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.ripple-effect:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* ================= MAGNETIC ELEMENTS ================= */
+[data-magnetic="true"] {
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+[data-magnetic="true"].magnetic-active {
+    transform: scale(1.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* ================= PERFORMANCE OPTIMIZATIONS ================= */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    [data-reveal] span,
+    [data-split-text] span {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    
+    [data-scroll-trigger] {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+/* ================= MOBILE OPTIMIZATIONS ================= */
+@media (max-width: 768px) {
+    [data-parallax] {
+        transform: none !important;
+    }
+    
+    .hero-word {
+        transform: none !important;
+        opacity: 1 !important;
+    }
+    
+    [data-split-text] span {
+        transform: none !important;
+        opacity: 1 !important;
+    }
+    
+    [data-scroll-trigger] {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+/* ================= HIGH DPI SUPPORT ================= */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .cursor-bubble-particle,
+    .cursor-leaf-particle {
+        transform: scale(0.8);
+    }
+}

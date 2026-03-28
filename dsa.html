@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA roadmap — Placement OS</title>
+    <script>try{document.documentElement.setAttribute("data-theme",localStorage.getItem("placement_os_theme")||"ocean");}catch(e){document.documentElement.setAttribute("data-theme","ocean");}</script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="motion.css">
+    <link rel="stylesheet" href="abyss.css">
+    <link rel="stylesheet" href="themes.css">
+</head>
+<body>
+<div class="container main-with-nav">
+    <header class="page-hero page-hero--animate" data-parallax="0.08">
+        <div class="page-hero__glow" aria-hidden="true"></div>
+        <p class="page-hero__eyebrow">DSA</p>
+        <h1 class="page-hero__title">
+            <span class="page-hero__line"><span class="page-hero__line-inner">Roadmap hub</span></span>
+        </h1>
+        <p class="page-hero__lede">Pick a difficulty band. Each level opens a filtered view in dsa-details — align drills with the package you are targeting.</p>
+    </header>
+
+    <section class="data-panel" data-reveal>
+        <div class="data-panel__head">
+            <div>
+                <div class="data-panel__eyebrow">Levels</div>
+                <h2 class="data-panel__title">Choose your band</h2>
+                <p class="data-panel__meta">These are preparation lenses, not guarantees — use them to pace depth and problem count.</p>
+            </div>
+        </div>
+        <div class="data-panel__body">
+            <div class="cards dash-grid" id="cardsContainer" data-reveal-stagger></div>
+        </div>
+    </section>
+
+    <div class="page-actions" data-reveal>
+        <button id="backBtn" type="button">← All sections</button>
+    </div>
+</div>
+
+<script src="theme.js"></script>
+<script src="api.js"></script>
+<script src="auth.js"></script>
+<script>
+    requireAuth();
+    window.__SHELL_ACTIVE__ = "dashboard";
+</script>
+<script src="ui.js"></script>
+<script src="abyss-ui.js"></script>
+<script src="shell.js"></script>
+<script src="motion.js"></script>
+<script src="abyss-fx.js"></script>
+<script>
+    const roadmap = [
+        { name: "Complete syllabus", key: "full", icon: "📘", sub: "Full coverage map" },
+        { name: "5–6 LPA level", key: "5lpa", icon: "💼", sub: "Foundations first" },
+        { name: "Up to 10 LPA", key: "10lpa", icon: "🚀", sub: "Core patterns" },
+        { name: "10–20 LPA", key: "20lpa", icon: "🔥", sub: "Harder stacks" },
+        { name: "20–50 LPA", key: "50lpa", icon: "🧠", sub: "Deep dives" },
+        { name: "50+ LPA", key: "top", icon: "🏆", sub: "Elite grind" },
+    ];
+
+    const container = document.getElementById("cardsContainer");
+    const backBtn = document.getElementById("backBtn");
+
+    roadmap.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.setAttribute("data-tilt", "");
+        card.innerHTML = `<h3>${item.icon} ${item.name}</h3><p class="dash-card__sub">${item.sub}</p>`;
+
+        card.addEventListener("click", () => {
+            localStorage.setItem("dsaType", item.key);
+            window.location.href = "dsa-details.html";
+        });
+
+        container.appendChild(card);
+    });
+
+    backBtn.addEventListener("click", () => {
+        diveTo("dashboard.html");
+    });
+</script>
+</body>
+</html>
