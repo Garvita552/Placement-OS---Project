@@ -13,7 +13,8 @@ class SmoothScrollManager {
     }
 
     init() {
-        this.setupSmoothScroll();
+        // Use native scrolling to avoid wheel hijacking breaking scroll behavior.
+        this.setupNativeScroll();
         this.setupTextAnimations();
         this.setupScrollTriggers();
         this.setupKeyboardNavigation();
@@ -121,6 +122,8 @@ class SmoothScrollManager {
             
             clearTimeout(scrollTimeout);
             document.body.classList.add('is-smooth-scrolling');
+            // Keep parallax + reveal animations updating with native scroll.
+            this.updateScrollAnimations();
             
             scrollTimeout = setTimeout(() => {
                 document.body.classList.remove('is-smooth-scrolling');

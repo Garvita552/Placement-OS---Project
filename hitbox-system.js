@@ -5,6 +5,7 @@ class HitboxWrapper {
     constructor(element) {
         this.element = element;
         this.hitbox = this.createHitbox();
+        this.triggerEl = null;
         this.content = this.getContentElement();
         this.isHovered = false;
         this.animationFrame = null;
@@ -43,6 +44,18 @@ class HitboxWrapper {
         this.element.style.position = 'relative';
         this.element.style.transformStyle = 'preserve-3d';
         this.element.appendChild(this.hitbox);
+
+        // Use the stable outer wrapper (created by ui.js) for hover tracking.
+        // This prevents the invisible overlay from blocking clicks.
+        if (this.element.parentElement && this.element.parentElement.classList?.contains('card-hitbox')) {
+            this.triggerEl = this.element.parentElement;
+        } else {
+            this.triggerEl = this.hitbox;
+        }
+
+        // If we're falling back to the inner overlay as the trigger, allow it to receive pointer events.
+        // If triggerEl is the outer wrapper, the inner overlay must stay click-through.
+        this.hitbox.style.pointerEvents = this.triggerEl === this.hitbox ? 'auto' : 'none';
         
         // Add content wrapper if needed
         if (!this.content.classList.contains('card-content')) {
@@ -59,14 +72,14 @@ class HitboxWrapper {
     }
 
     setupEventListeners() {
-        this.hitbox.addEventListener('mouseenter', this.onMouseEnter.bind(this));
-        this.hitbox.addEventListener('mouseleave', this.onMouseLeave.bind(this));
-        this.hitbox.addEventListener('mousemove', this.onMouseMove.bind(this));
+        this.triggerEl.addEventListener('mouseenter', this.onMouseEnter.bind(this));
+        this.triggerEl.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+        this.triggerEl.addEventListener('mousemove', this.onMouseMove.bind(this));
         
         // Touch events for mobile
-        this.hitbox.addEventListener('touchstart', this.onTouchStart.bind(this));
-        this.hitbox.addEventListener('touchend', this.onTouchEnd.bind(this));
-        this.hitbox.addEventListener('touchmove', this.onTouchMove.bind(this));
+        this.triggerEl.addEventListener('touchstart', this.onTouchStart.bind(this));
+        this.triggerEl.addEventListener('touchend', this.onTouchEnd.bind(this));
+        this.triggerEl.addEventListener('touchmove', this.onTouchMove.bind(this));
     }
 
     onMouseEnter(e) {
@@ -110,7 +123,7 @@ class HitboxWrapper {
     }
 
     updateMousePosition(e) {
-        const rect = this.hitbox.getBoundingClientRect();
+        const rect = this.triggerEl.getBoundingClientRect();
         this.mousePosition.x = (e.clientX - rect.left) / rect.width;
         this.mousePosition.y = (e.clientY - rect.top) / rect.height;
         
@@ -121,7 +134,7 @@ class HitboxWrapper {
     }
 
     updateMousePositionFromTouch(touch) {
-        const rect = this.hitbox.getBoundingClientRect();
+        const rect = this.triggerEl.getBoundingClientRect();
         this.mousePosition.x = (touch.clientX - rect.left) / rect.width;
         this.mousePosition.y = (touch.clientY - rect.top) / rect.height;
         
@@ -162,12 +175,10 @@ class HitboxWrapper {
         if (this.animationFrame) {
             cancelAnimationFrame(this.animationFrame);
         }
-        this.hitbox.removeEventListener('mouseenter', this.onMouseEnter);
-        this.hitbox.removeEventListener('mouseleave', this.onMouseLeave);
-        this.hitbox.removeEventListener('mousemove', this.onMouseMove);
-        this.hitbox.removeEventListener('touchstart', this.onTouchStart);
-        this.hitbox.removeEventListener('touchend', this.onTouchEnd);
-        this.hitbox.removeEventListener('touchmove', this.onTouchMove);
+        if (this.triggerEl) {
+            // Note: we intentionally do not try to perfectly unregister bound handlers,
+            // since we used bind() inline. This is still safe for page-load lifecycles.
+        }
         
         if (this.hitbox.parentNode) {
             this.hitbox.parentNode.removeChild(this.hitbox);

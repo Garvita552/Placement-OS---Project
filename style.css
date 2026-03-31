@@ -337,6 +337,7 @@ button:hover::before { opacity: 1; transform: scale(1); animation: ripple 1s inf
     z-index: 10 !important;
     cursor: pointer !important;
     background: transparent !important;
+    pointer-events: none; /* let buttons/inputs inside card remain clickable (JS re-enables when needed) */
     border: none !important;
     outline: none !important;
 }
@@ -485,7 +486,7 @@ button:hover::before { opacity: 1; transform: scale(1); animation: ripple 1s inf
 }
 .card .badge strong { color: var(--c-cyan); }
 
-/* Shimmer sweep on hover (opacity-only animation inside) */
+/* Shimmer sweep (driven by JS .hovering state, not CSS :hover) */
 .card-shimmer {
     position: absolute;
     inset: 0;
@@ -504,7 +505,7 @@ button:hover::before { opacity: 1; transform: scale(1); animation: ripple 1s inf
     transition: opacity 0.4s ease;
 }
 
-.card:hover .card-shimmer {
+.card.hovering .card-shimmer {
     opacity: 1;
     animation: cardShimmer 2.2s ease-in-out infinite;
 }
